@@ -4,67 +4,61 @@ All notable changes, architectural decisions, and package configurations across 
 
 ---
 
+## [Milestone 2] - Multimodal GenAI Extraction & Urgency Triage Engine
+**Date:** 2026-08-18  
+**Status:** Completed  
+**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Event:** Automate India 2026 — NIET Chapter
+
+### Added & Modified Components
+
+#### 1. Backend Service (`/backend`)
+- `app/services/gemini_service.py` [NEW]:
+  - Multimodal AI ingestion service using `google-genai` SDK (`from google import genai`).
+  - Strict Pydantic JSON extraction via `response_mime_type="application/json"` and `response_schema=MultimodalGeminiExtraction`.
+  - Regional dialect recognition (Hindi, Bhojpuri, Bengali, Tamil, Telugu, etc.) with verbatim transcript and English translation.
+  - Extraction of hazard type, severity (1-10), trapped status/count, vulnerable demographics, reported medical injuries, and 3-bullet dynamic responder SOP.
+  - Zero-key / offline heuristic mock fallback guaranteeing 100% testability and uptime.
+- `app/services/triage_engine.py` [NEW]:
+  - Pure, deterministic, explainable mathematical calculation of composite 0-100 Urgency Triage Score.
+  - Weighted factor model: Hazard Severity ($H_{\text{sev}} \le 35$), Trapped Victims ($T_{\text{rap}} \le 25$), Vulnerability Demographics ($V_{\text{uln}} \le 25$), Medical Trauma ($M_{\text{ed}} \le 10$), and Recency Freshness ($R_{\text{ec}} \le 5$).
+  - Maps score to standard triage tiers: `CRITICAL_P1` (80-100), `URGENT_P2` (60-79), `MODERATE_P3` (40-59), `LOW_P4` (0-39).
+- `app/api/v1/endpoints/triage.py` [NEW]:
+  - `POST /api/v1/triage/multimodal` accepting `multipart/form-data` (audio file/recording, photo upload, distress text, GPS latitude & longitude).
+  - Automatically saves uploaded audio/photo assets to static `uploads/` directory for playback and audit trail.
+  - Persists spatial point in PostGIS (`SRID=4326;POINT(lng lat)`) and returns complete `MultimodalTriageResponse`.
+- `app/api/v1/router.py` [MODIFIED]: Mounted `/api/v1/triage` router.
+- `app/schemas/incident.py` [MODIFIED]: Added schemas for `VulnerableGroupBreakdown`, `SafetySOP`, `MultimodalGeminiExtraction`, `TriageBreakdown`, and `MultimodalTriageResponse`.
+- `app/core/config.py` [MODIFIED]: Added static upload directory configuration (`UPLOAD_DIR`, `MAX_UPLOAD_SIZE_MB`).
+- `main.py` [MODIFIED]: Mounted static file handler for `/uploads` and updated version metadata to `0.2.0`.
+
+#### 2. Frontend Application (`/frontend`)
+- `src/lib/api.ts` [MODIFIED]:
+  - Added TypeScript interfaces matching backend models (`MultimodalGeminiExtraction`, `TriageBreakdown`, `MultimodalTriageResponse`, `VulnerableGroupBreakdown`, `SafetySOP`).
+  - Added `submitMultimodalIncident(formData: FormData)` API function.
+- `src/components/CitizenSOSForm.tsx` [NEW]:
+  - Emergency distress intake supporting live in-browser audio recording via `MediaRecorder` API with timer and playback.
+  - Audio file attachment, disaster scene photo capture/upload with thumbnail preview.
+  - HTML5 Geolocation API auto-detection with manual coordinate override.
+  - Cellular dead-zone offline mode toggle.
+- `src/components/LiveTriageResultCard.tsx` [NEW]:
+  - Real-time 0-100 urgency score gauge with color-coded severity tiers.
+  - Expandable explainable AI scoring math breakdown.
+  - Dialect translation card showing verbatim transcript and English translation.
+  - Entity badges for trapped count, vulnerable demographics, hazard ratings, and trauma injuries.
+  - Dynamic 3-bullet Responder Safety SOP card with action protocol steps.
+  - Audio playback and photo evidence preview.
+- `src/app/page.tsx` [MODIFIED]: Integrated `CitizenSOSForm` and `LiveTriageResultCard` across Commander, Citizen, and Volunteer tabs.
+
+#### 3. Architecture Documentation
+- `Decisions.md`: Added ADR 005 (Multimodal GenAI Extraction & Deterministic Urgency Scoring).
+- `Flow.md`: Updated sequence diagrams for `POST /api/v1/triage/multimodal` lifecycle and explainable triage scoring formula.
+- `README.md`: Updated with Milestone 2 feature overview, API schemas, and cURL testing guide.
+
+---
+
 ## [Milestone 1] - Initial Foundation, Docker Environment, Base Skeletons, and Core Architecture
 **Date:** 2026-08-17  
 **Status:** Completed  
 **Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
 **Event:** Automate India 2026 — NIET Chapter
-
-### Added Files & Directory Structure
-
-#### 1. Root & Orchestration
-- `.env.example`: Environment variables template defining database credentials, Gemini AI model parameters, Mapbox public tokens, and disaster response priority thresholds.
-- `.gitignore`: Comprehensive ignore rules for Python bytecode, virtual environments, Node.js packages, `.next` build caches, SQLite/PostgreSQL data directories, and environment secrets.
-- `docker-compose.yml`: Multi-container Docker orchestration connecting:
-  - `db`: `postgis/postgis:16-3.4` container with healthchecks and persistent named volume `soteria_postgres_data`.
-  - `backend`: FastAPI Python 3.11 container with hot-reloading and automatic health check dependency on `db`.
-  - `frontend`: Next.js 14 container with node_modules volume caching and mapped port `3000`.
-- `docs/screenshots/.gitkeep`: Dedicated directory for hackathon walkthrough screenshots and media.
-
-#### 2. Backend Service (`/backend`)
-- `requirements.txt`: Specified production dependencies:
-  - `fastapi` & `uvicorn[standard]` (REST API Framework)
-  - `pydantic` & `pydantic-settings` (Environment configuration & type validation)
-  - `sqlalchemy` & `asyncpg` & `psycopg2-binary` (Async ORM & PostgreSQL drivers)
-  - `geoalchemy2` & `shapely` (PostGIS spatial geometry handling)
-  - `google-genai` & `google-generativeai` (Gemini Multimodal AI SDKs)
-  - `httpx` & `python-multipart` (Async HTTP and multipart form uploads)
-- `Dockerfile`: Debian-based multi-stage container including system packages `libpq-dev`, `libgeos-dev`, `libproj-dev`, `gdal-bin`, `libgdal-dev`.
-- `.dockerignore`: Filtered build context for backend images.
-- `main.py`: FastAPI application entrypoint with lifespan event, CORS middleware explicitly allowing `http://localhost:3000` and `http://127.0.0.1:3000`, root system info metadata endpoint `GET /`, and mounted v1 API routers.
-- `app/core/config.py`: Pydantic `BaseSettings` reading environment variables with dynamic CORS array parsing and disaster triage threshold constants.
-- `app/core/database.py`: Asynchronous SQLAlchemy engine (`create_async_engine`) and session generator. Implements `init_db()` executing `CREATE EXTENSION IF NOT EXISTS postgis;` inside an async connection block.
-- `app/models/incident.py`: SQLAlchemy ORM model for disaster incidents featuring:
-  - Spatial point column `Geometry(geometry_type='POINT', srid=4326)`
-  - Modality enums (`VOICE`, `IMAGE`, `TEXT`, `SOCIAL`, `SENSOR`)
-  - Triage category enums (`CRITICAL_P1`, `URGENT_P2`, `MODERATE_P3`, `LOW_P4`)
-  - JSON columns for `extracted_entities`, `safety_sop`, and `verification_data`
-- `app/models/volunteer.py`: SQLAlchemy ORM model for field responders with skill arrays, real-time spatial ping coordinates, and availability statuses.
-- `app/schemas/health.py`: Pydantic schemas validating database and PostGIS extension health state.
-- `app/schemas/incident.py`: Validation models for incident ingestion (`IncidentCreate`), response serialization (`IncidentRead`), updates (`IncidentUpdate`), and structured safety SOPs (`SafetySOPResponse`).
-- `app/api/v1/endpoints/health.py`: `GET /api/v1/health` returning system and PostGIS extension diagnostics.
-- `app/api/v1/endpoints/incidents.py`: Endpoints for `POST /api/v1/incidents/` (ingestion with preliminary heuristic triage), `GET /api/v1/incidents/` (priority-sorted spatial listing), `GET /api/v1/incidents/{id}`, and `PATCH /api/v1/incidents/{id}`.
-- `app/api/v1/router.py`: Aggregated router mounting health and incident routes under `/api/v1`.
-
-#### 3. Frontend Application (`/frontend`)
-- `package.json`: Configured Next.js 14, React 18, Tailwind CSS, Lucide React icons, `clsx`, and `tailwind-merge`.
-- `tsconfig.json`: TypeScript compiler options and `@/*` path alias configuration.
-- `tailwind.config.ts`: Custom disaster command center theme with triage hazard tokens (Critical Red, Urgent Orange, Moderate Yellow, Low Green) and dark slate surface palettes.
-- `postcss.config.mjs`: PostCSS configuration for Tailwind.
-- `next.config.mjs`: Standalone build configuration with `/api/proxy` rewrites to the FastAPI backend.
-- `Dockerfile`: Node.js 20 Alpine container setup.
-- `src/app/globals.css`: Inter font integration, dark background baseline, glassmorphism panel styles, and glow pulse utilities.
-- `src/app/layout.tsx`: Root layout with metadata and responsive viewport settings.
-- `src/lib/api.ts`: Typed API client interfaces, backend health polling, incident ingestion helpers, and resilient fallback mock data.
-- `src/lib/utils.ts`: Classname merge and timestamp formatting utilities.
-- `src/components/ui/StatusBadge.tsx`: Reusable priority status indicators (`P1 CRITICAL`, `P2 URGENT`, `DISPATCHED`, `RESOLVED`) with pulsing animations.
-- `src/components/Navbar.tsx`: Header component with real-time backend connection status, PostGIS indicator, and role tab navigation.
-- `src/app/page.tsx`: Interactive multi-role portal featuring:
-  - **Commander View:** Real-time prioritized triage queue, 0-100 AI score breakdown, dynamic volunteer safety SOP briefing.
-  - **Citizen SOS (PWA):** Multimodal emergency distress signal intake (Voice, Photo, Text) with offline queue simulation.
-  - **Volunteer SOP Hub:** Safety checklist and AI-verified proof-of-action closure receipt preview.
-
-#### 4. Architecture Documentation
-- `Decisions.md`: Architectural Decision Records (ADRs 001-004) covering framework choices, PostGIS rationale, Docker strategy, and multimodal offline sync.
-- `Flow.md`: Complete end-to-end data flow specifications with Mermaid diagrams and ASCII charts.
-- `README.md`: Comprehensive hackathon documentation with project background, architecture overview, prerequisites, 1-command startup instructions, and roadmap.

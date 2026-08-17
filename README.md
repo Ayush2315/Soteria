@@ -37,14 +37,14 @@ In the initial hours of a catastrophic disaster (floods, earthquakes, building c
 
 ---
 
-## 🚀 Key Platform Capabilities
+## 🚀 Key Platform Capabilities (Milestone 2 Active)
 
 | Capability | Legacy Approach | Soteria Platform |
 | :--- | :--- | :--- |
-| **Mass Distress Intake** | Manual call centers, language limited | **Automated Multimodal Voice, Photo, Text Intake** |
-| **Triage Prioritization** | First-come, first-served or loudest caller | **0–100 AI Urgency Triage with Equity Weighting** |
+| **Mass Distress Intake** | Manual call centers, language limited | **Multimodal Voice (Dialects), Photo, Text Intake** |
+| **Triage Prioritization** | First-come, first-served or loudest caller | **Deterministic 0–100 AI Urgency Triage with Explainable Math** |
 | **Connectivity Failure** | Complete failure in cellular dead-zones | **Offline-First PWA with Edge Queuing & Auto-Sync** |
-| **Spatial Mapping** | Static GIS points with historical lag | **PostGIS Real-Time Hexagonal Risk Heatmaps** |
+| **Spatial Mapping** | Static GIS points with historical lag | **PostGIS Real-Time Hexagonal Risk Heatmaps (SRID 4326)** |
 | **Volunteer Coordination** | Uncoordinated WhatsApp groups | **Dynamic Hazard SOPs & AI-Verified Photo Closure** |
 | **Command Reporting** | Manual hours-long reporting delays | **Automated 30-Minute 3-Bullet GenAI SitReps** |
 
@@ -58,18 +58,20 @@ In the initial hours of a catastrophic disaster (floods, earthquakes, building c
     ┌─────────────────────────── CLIENT & MOBILE LAYER ───────────────────────────┐
     │                                                                             │
     │   [ Citizen SOS Portal (PWA) ]   [ Commander GIS ]   [ Volunteer SOP Hub ]  │
-    │   • Offline Voice & Photo Intake • Live Urgency Feed • Safety SOP Briefings │
-    │   • IndexedDB Edge Sync Queue    • PostGIS Heatmap   • AI Photo Verification│
+    │   • Live Voice Note Recording    • Live Urgency Feed • Safety SOP Briefings │
+    │   • Photo Capture & Upload       • Explainable Math  • AI Photo Verification│
+    │   • HTML5 GPS Auto-Detection     • PostGIS Heatmap   • Task Action Logs     │
     │                                                                             │
     └──────────────────────────────────────┬──────────────────────────────────────┘
-                                           │ HTTP/REST (JSON & Multipart)
+                                           │ HTTP/REST (JSON & Multipart Form-Data)
                                            ▼
     ┌───────────────────────────── API & BACKEND LAYER ───────────────────────────┐
     │                                                                             │
     │   FastAPI (Python 3.11+) Asynchronous REST Gateway                          │
     │   • Async Session Management (asyncpg)                                      │
-    │   • Automated PostGIS Spatial Engine Initialization                         │
-    │   • Preliminary Heuristic & Multimodal AI Routing                           │
+    │   • Multimodal GenAI Pipeline (google-genai SDK)                            │
+    │   • Deterministic 0-100 Triage Engine                                       │
+    │   • Static Audio/Image Media Mount (/uploads)                               │
     │                                                                             │
     └──────────────────────┬───────────────────────────────┬──────────────────────┘
                            │                               │
@@ -77,17 +79,17 @@ In the initial hours of a catastrophic disaster (floods, earthquakes, building c
     ┌──────────────── SPATIAL DATABASE ────────┐  ┌──────── MULTIMODAL AI ────────┐
     │                                          │  │                               │
     │   PostgreSQL 16 + PostGIS 3.4 (SRID 4326)│  │   Google Gemini 1.5 Flash     │
-    │   • Geodesic Distance (ST_DWithin)       │  │   • Voice Dialect Transcription│
-    │   • Hexagonal Risk Binning (ST_Hexagon)  │  │   • Vision Damage Assessment  │
-    │   • R-Tree Spatial Indexing (GIST)       │  │   • Automated 3-Bullet SitReps│
+    │   • Geodesic Distance (ST_DWithin)       │  │   • Regional Dialect Parser   │
+    │   • Hexagonal Risk Binning (ST_Hexagon)  │  │   • Vision Hazard Extraction  │
+    │   • R-Tree Spatial Indexing (GIST)       │  │   • Structured Pydantic JSON  │
     │                                          │  │                               │
     └──────────────────────────────────────────┘  └───────────────────────────────┘
 ```
 
-- **Frontend:** Next.js 14 (App Router), React 18, Tailwind CSS, Lucide React Icons, Mapbox GL JS ready.
+- **Frontend:** Next.js 14 (App Router), React 18, Tailwind CSS, Lucide React Icons, HTML5 MediaRecorder & Geolocation API.
 - **Backend:** FastAPI (Python 3.11+), SQLAlchemy 2.0 (Async), `asyncpg`, GeoAlchemy2, Pydantic v2 Settings.
 - **Database:** PostgreSQL 16 + PostGIS 3.4 (`postgis/postgis:16-3.4`) with EPSG:4326 WGS 84 spatial indexing.
-- **AI Intelligence:** Google Gemini Multimodal APIs (`google-genai` & `google-generativeai`).
+- **AI Intelligence:** Google Gemini Multimodal APIs (`google-genai` & `google-generativeai`) with resilient zero-key mock fallback.
 - **Orchestration:** Docker Compose multi-container networking with persistent named volumes.
 
 ---
@@ -101,7 +103,7 @@ In the initial hours of a catastrophic disaster (floods, earthquakes, building c
 ### 1. Clone & Configure Environment
 ```bash
 # Clone the repository
-git clone https://github.com/aryan-singh/soteria.git
+git clone https://github.com/Ayush2315/Soteria.git
 cd soteria
 
 # Create your environment configuration from the template
@@ -113,40 +115,38 @@ cp .env.example .env
 docker compose up --build
 ```
 
-That's it! Docker Compose will automatically:
+Docker Compose will automatically:
 1. Spin up the PostGIS 16 spatial database and wait for healthy initialization.
 2. Build and launch the Python 3.11 FastAPI backend and automatically run `CREATE EXTENSION IF NOT EXISTS postgis;`.
 3. Build and launch the Next.js 14 Command Center on port `3000`.
 
 ### 3. Access the Live Applications:
-- 🌐 **Web Command Center & Citizen PWA:** [http://localhost:3000](http://localhost:3000)
+- 🌐 **Web Command Center & Citizen SOS PWA:** [http://localhost:3000](http://localhost:3000)
 - ⚙️ **FastAPI Interactive Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - 🩺 **System & PostGIS Health Check:** [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
-- 📊 **Incidents Triage API:** [http://localhost:8000/api/v1/incidents/](http://localhost:8000/api/v1/incidents/)
+- 🚨 **Multimodal Triage Endpoint:** `POST http://localhost:8000/api/v1/triage/multimodal`
+- 📊 **Incidents Triage Feed:** [http://localhost:8000/api/v1/incidents/](http://localhost:8000/api/v1/incidents/)
 
 ---
 
-## 💻 Bare-Metal Local Development (Without Docker)
+## 🧪 Testing the Multimodal GenAI Triage Engine (cURL)
 
-If you wish to develop without Docker containers:
-
-### 1. Database (PostgreSQL + PostGIS)
-Ensure a local PostgreSQL instance is running with PostGIS enabled on port `5432` with database `soteria_db`.
-
-### 2. Backend Setup
+### Test 1: Multipart Text SOS Ingestion
 ```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+curl -X POST "http://localhost:8000/api/v1/triage/multimodal" \
+  -F "text=Flood water has risen 4 feet near North Bridge! 3 people trapped on roof including elderly grandmother and infant." \
+  -F "latitude=25.4358" \
+  -F "longitude=81.8463" \
+  -F "location_name=Sector 3 North Bridge, Prayagraj"
 ```
 
-### 3. Frontend Setup
+### Test 2: Multipart Audio SOS Ingestion
 ```bash
-cd frontend
-npm install
-npm run dev
+curl -X POST "http://localhost:8000/api/v1/triage/multimodal" \
+  -F "audio=@/path/to/voice_sos.wav;type=audio/wav" \
+  -F "latitude=25.4412" \
+  -F "longitude=81.8329" \
+  -F "location_name=Old City Market"
 ```
 
 ---
@@ -154,11 +154,12 @@ npm run dev
 ## 📡 REST API Reference
 
 ### System & Health Endpoints
-- `GET /` : Platform metadata, team info, and API documentation links.
+- `GET /` : Platform metadata, version `0.2.0`, and API documentation links.
 - `GET /api/v1/health` : Live healthcheck returning PostgreSQL connection status and PostGIS extension activation details.
 
-### Disaster Incidents & Multimodal Triage
-- `POST /api/v1/incidents/` : Ingest distress signal (voice note transcript, photo, text, coordinates). Computes automated triage score (0-100), assigns P1-P4 priority, and stores PostGIS geometry.
+### Multimodal AI Triage & Disaster Incidents
+- `POST /api/v1/triage/multimodal` : **[Milestone 2]** Accepts `multipart/form-data` with audio note, scene photo, text message, and coordinates. Executes Google Gemini structured extraction, computes 0-100 deterministic urgency score, and logs spatial point in PostGIS.
+- `POST /api/v1/incidents/` : Ingest JSON distress signal and stores PostGIS geometry.
 - `GET /api/v1/incidents/` : Query prioritized incident queue with filters (`status`, `category`, `min_score`, `limit`, `offset`).
 - `GET /api/v1/incidents/{id}` : Fetch complete incident dossier with structured extracted entities and dynamic volunteer safety SOP.
 - `PATCH /api/v1/incidents/{id}` : Update incident status (`DISPATCHED`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`), assign volunteers, or attach proof-of-action verification data.
@@ -167,9 +168,9 @@ npm run dev
 
 ## 🗺️ Staged Roadmap
 
-- **Milestone 1 (Current):** Project Foundation, Docker Environment, PostGIS Integration, Base FastAPI & Next.js Skeletons, and Core Architecture Documentation (`ChangeLog.md`, `Decisions.md`, `Flow.md`, `README.md`).
-- **Milestone 2:** Gemini Multimodal Audio/Vision Ingestion Pipeline, Dialect Translation, 0–100 Triage Scoring Engine, and Dynamic Safety SOP Generator.
-- **Milestone 3:** Real-Time Mapbox PostGIS Heatmaps, Proximity Volunteer Auto-Dispatch, Automated 30-Min SitRep Engine, and AI-Verified Photo Closures.
+- **Milestone 1 (Completed):** Project Foundation, Docker Environment, PostGIS Integration, Base FastAPI & Next.js Skeletons, and Core Architecture Documentation (`ChangeLog.md`, `Decisions.md`, `Flow.md`, `README.md`).
+- **Milestone 2 (Completed):** Gemini Multimodal Audio/Vision Ingestion Pipeline, Regional Dialect Translation, Deterministic 0–100 Triage Scoring Engine, Dynamic Responder Safety SOPs, and Citizen SOS + Live Triage Result Card UI components.
+- **Milestone 3 (Next):** Real-Time Mapbox PostGIS Heatmaps, Proximity Volunteer Auto-Dispatch (`ST_DWithin`), Automated 30-Min SitRep Engine, and AI-Verified Photo Closures.
 
 ---
 

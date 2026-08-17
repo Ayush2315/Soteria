@@ -9,8 +9,8 @@ This document details the high-level request lifecycle, AI extraction pipelines,
 ```mermaid
 flowchart TD
     subgraph Clients["1. Target User Clients"]
-        Citizen["📱 Citizen SOS (PWA / Offline Voice & Photo)"]
-        Commander["🖥️ Commander GIS Dashboard (Heatmaps & SitReps)"]
+        Citizen["📱 Citizen SOS (PWA / Live Voice Note & Photo Upload)"]
+        Commander["🖥️ Commander GIS Dashboard (Heatmaps & Priority Feed)"]
         Volunteer["🦺 Volunteer Response Hub (SOPs & AI Photo Closure)"]
     end
 
@@ -19,10 +19,10 @@ flowchart TD
         APIGateway["FastAPI Async REST Gateway (:8000)"]
     end
 
-    subgraph IntelligenceLayer["3. Multimodal AI & Triage Engine"]
-        GeminiFlash["Google Gemini 1.5 Flash (Multimodal Audio & Image Parser)"]
-        TriageEngine["0-100 Urgency Scoring & Vulnerability Algorithm"]
-        SOPGenerator["Dynamic Hazard & Responder SOP Generator"]
+    subgraph IntelligenceLayer["3. Multimodal GenAI & Triage Engine"]
+        GeminiFlash["Google Gemini 1.5 Flash (Structured Pydantic Extraction)"]
+        TriageEngine["0-100 Mathematical Urgency Engine (Explainable XAI)"]
+        SOPGenerator["Dynamic 3-Bullet Responder Safety SOP Generator"]
     end
 
     subgraph SpatialDatabase["4. Geospatial Data Layer"]
@@ -59,50 +59,66 @@ flowchart TD
 
 ---
 
-## 2. End-to-End Multimodal SOS Ingestion & AI Triage Flow
+## 2. Milestone 2: Multimodal SOS Ingestion & AI Triage Sequence
 
-```
-[Victim in Disaster Zone]
-       │
-       ▼ (Sends frantic voice note in dialect or snaps photo)
-[Citizen PWA Interface]
-       │
-       ├──[Network Offline?] ──► [IndexedDB Local Encrypted Queue]
-       │                                     │
-       │                                     ▼ (Network signal returns)
-       └──[Network Online]  ─────────────────┘
-                    │
-                    ▼ HTTP POST /api/v1/incidents/
-[FastAPI Ingestion Endpoint (Async Worker)]
-       │
-       ├──► [GeoAlchemy2: Convert GPS to ST_SetSRID(ST_MakePoint(lng, lat), 4326)]
-       │
-       ├──► [Stream Payload to Google Gemini Multimodal API]
-       │            │
-       │            ▼
-       │      [Structured JSON Extraction]
-       │      • Trapped Persons Count: 3
-       │      • Vulnerable: Elderly (2), Infant (1)
-       │      • Hazard: Rapid Flood + Transformer Arcing
-       │      • Medical: Hypothermia & Trauma
-       │
-       ├──► [Compute 0-100 Triage Composite Score]
-       │      Score = Base(30) + Trapped(20) + Vulnerable(20) + Hazard(20) = 90.0 (CRITICAL_P1)
-       │
-       ├──► [Synthesize Dynamic Volunteer Safety SOP]
-       │      • Gear: Inflatable Boat, High-Voltage Insulated Boots, Infant PFD
-       │      • Protocol: De-energize transformer -> Approach upstream -> Evacuate infant first
-       │
-       ▼
-[Persist Incident in PostGIS Database]
-       │
-       ├──► [Trigger Real-Time Webhook to GIS Dashboard (Mapbox Heatmap)]
-       └──► [Trigger Proximity Match: Find nearest qualified responders within 5km]
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Citizen / First Responder
+    participant NextJS as Next.js 14 Frontend
+    participant API as FastAPI Backend (:8000)
+    participant Storage as /uploads Local Media Storage
+    participant Gemini as Google Gemini 1.5 Flash (google-genai)
+    participant Engine as 0-100 Triage Math Engine
+    participant DB as PostgreSQL 16 + PostGIS (SRID 4326)
+
+    C->>NextJS: 1. Speaks in regional dialect (e.g., Hindi/Bhojpuri) + snaps scene photo
+    NextJS->>API: 2. POST /api/v1/triage/multimodal (multipart/form-data)
+    API->>Storage: 3. Persist voice_sos.webm and scene_photo.jpg
+    alt Live Gemini API Key Configured
+        API->>Gemini: 4a. Stream Audio/Photo buffer + prompt + response_schema
+        Gemini-->>API: 5a. Structured JSON (Transcript, Translation, Hazard, Trapped, SOP)
+    else Zero-Key / Network Fallback
+        API->>API: 4b/5b. Heuristic Dialect Extractor & SOP Generator
+    end
+    API->>Engine: 6. calculate_triage_score(extraction, client_timestamp)
+    Note over Engine: Score = H_sev(35) + T_rap(25) + V_uln(25) + M_ed(10) + R_ec(5)
+    Engine-->>API: 7. TriageBreakdown (Score: 93.5, Tier: CRITICAL_P1)
+    API->>DB: 8. INSERT into incidents (geom: SRID=4326;POINT(lng lat), score: 93.5)
+    DB-->>API: 9. Incident record created (ID: 104)
+    API-->>NextJS: 10. HTTP 201 MultimodalTriageResponse
+    NextJS->>C: 11. Render LiveTriageResultCard & Live Feed in Commander View
 ```
 
 ---
 
-## 3. PostGIS Hexagonal Risk Density & Spatial Clustering
+## 3. Explainable 0-100 Urgency Triage Math Formula
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              SOTERIA URGENCY TRIAGE FORMULA                            │
+│                                                                                        │
+│   Final Score = clamp(0, 100, H_sev + T_rap + V_uln + M_ed + R_ec)                     │
+├──────────────────────────┬───────────┬─────────────────────────────────────────────────┤
+│ Factor                   │ Max Pts   │ Mathematical Formula / Criteria                 │
+├──────────────────────────┼───────────┼─────────────────────────────────────────────────┤
+│ Hazard Severity (H_sev)  │ 35.0 pts  │ hazard_severity (1-10) * 3.5                    │
+│ Trapped Factor (T_rap)   │ 25.0 pts  │ If trapped: 15.0 + min(10.0, trapped_count*2.5) │
+│ Vulnerability (V_uln)    │ 25.0 pts  │ min(25.0, 3.0*eld + 3.5*chd + 4.0*preg + 4*dis) │
+│ Medical Trauma (M_ed)    │ 10.0 pts  │ min(10.0, len(injuries_reported) * 3.5)         │
+│ Recency Freshness (R_ec) │  5.0 pts  │ Fresh (<=15m): 5.0 | Older: max(0, 5 - dt/30)   │
+└──────────────────────────┴───────────┴─────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+       ┌────────────────────┬────────────────────┬────────────────────┐
+       │ CRITICAL_P1 (>=80) │  URGENT_P2 (60-79) │ MODERATE_P3 (40-59)│
+       │ Life Threat (<10m) │ Rescue Queue (<30m)│ Sustenance (<2h)   │
+       └────────────────────┴────────────────────┴────────────────────┘
+```
+
+---
+
+## 4. PostGIS Hexagonal Risk Density & Spatial Clustering
 
 ```
                        [Incoming Incident Points (SRID:4326)]
@@ -122,36 +138,6 @@ flowchart TD
           ║  HEX-01: P4  ║  HEX-02: P1  ║  HEX-03: P2  ║
           ║  Low (12.0)  ║ Critical(94) ║ Urgent (71)  ║
           ╚══════════════╩══════════════╩══════════════╝
-```
-
----
-
-## 4. Volunteer Dispatch, Dynamic SOP & Closed-Loop Verification
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor C as Citizen
-    participant API as FastAPI Backend
-    participant DB as PostGIS DB
-    participant AI as Gemini Multimodal Engine
-    actor V as Field Volunteer
-    actor CMD as Commander
-
-    C->>API: 1. Ingest Distress Signal (Audio / Photo / GPS)
-    API->>AI: 2. Extract Entities, Triage Score & SOP
-    AI-->>API: 3. Structured Triage JSON + Safety Protocol
-    API->>DB: 4. Insert Incident with PostGIS Point (SRID 4326)
-    DB-->>CMD: 5. Live Feed Update & Heatmap Refresh
-    API->>DB: 6. Spatial Query ST_DWithin(volunteer_geom, incident_geom, 5000)
-    DB-->>API: 7. Selected Nearest Responder: VOL-8842
-    API->>V: 8. Push Mission Alert with Dynamic Safety SOP Briefing
-    V->>V: 9. Executes On-Site Rescue following SOP checklist
-    V->>API: 10. Uploads Rescue Proof Photo to Close Ticket
-    API->>AI: 11. Multimodal Verification: Compare Initial Scene vs. Resolution Photo
-    AI-->>API: 12. Verification Approved (Confidence: 97%)
-    API->>DB: 13. Update Incident Status = CLOSED / RESOLVED
-    DB-->>CMD: 14. Real-time Mission Completed Confirmation
 ```
 
 ---

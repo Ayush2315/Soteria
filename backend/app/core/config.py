@@ -5,6 +5,7 @@ from typing import List, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import json
+import os
 
 
 class Settings(BaseSettings):
@@ -14,6 +15,10 @@ class Settings(BaseSettings):
     APP_NAME: str = "SOTERIA"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "soteria_super_secret_development_key_32chars_minimum"
+
+    # Uploads & Media Storage
+    UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
+    MAX_UPLOAD_SIZE_MB: int = 25
 
     # CORS Configuration
     CORS_ORIGINS: Union[List[str], str] = [

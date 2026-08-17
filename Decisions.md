@@ -98,4 +98,29 @@ We architected a two-stage multimodal ingestion and offline sync protocol:
 
 ### Consequences
 - **Positive:** Zero data loss in dead-zones, accessibility across languages and trauma states, actionable structured intelligence for commanders.
-- **Trade-off:** Gemini API calls require fallback heuristic scoring during network latency or token rate-limiting (implemented in `_compute_preliminary_triage`).
+- **Trade-off:** Gemini API calls require fallback heuristic scoring during network latency or token rate-limiting.
+
+---
+
+## ADR 005: Deterministic Triage Urgency Math Engine with Explainable Subscores
+
+### Context & Problem Statement
+While Large Language Models (LLMs) excel at qualitative reasoning, natural language parsing, and dialect translation, relying purely on an LLM to generate numerical priority ranks introduces hallucination risks, non-deterministic sorting, and lack of mathematical explainability for government incident commanders and military disaster responders.
+
+### Decision
+We decoupled **Multimodal Intelligence Extraction** (handled by Google Gemini 1.5 Flash with Pydantic JSON schemas) from **Numerical Urgency Scoring** (handled by a pure, deterministic mathematical engine in Python).
+
+### Rationale
+- **Guaranteed Bounded Scoring (0.0 to 100.0):** The triage formula combines five distinct, bounded mathematical factors:
+  1. $H_{\text{sev}}$: Hazard Severity (Max 35.0 pts)
+  2. $T_{\text{rap}}$: Trapped Persons Factor (Max 25.0 pts)
+  3. $V_{\text{uln}}$: Vulnerability Demographics (Max 25.0 pts)
+  4. $M_{\text{ed}}$: Medical Trauma & Wounds (Max 10.0 pts)
+  5. $R_{\text{ec}}$: Recency / Freshness Offset (Max 5.0 pts)
+- **Explainable AI (XAI):** Commanders can inspect exactly why an incident received a score of 93.5 vs 74.0, viewing the exact subscore contributions in the UI.
+- **Strict Tier Mapping:** Eliminates subjective ambiguity by mapping deterministically to `CRITICAL_P1` (80-100), `URGENT_P2` (60-79), `MODERATE_P3` (40-59), and `LOW_P4` (0-39).
+- **Resilient Zero-Key Fallback:** If Gemini API is unreachable, the system applies heuristic text keyword analysis without interrupting the deterministic math pipeline.
+
+### Consequences
+- **Positive:** 100% reproducible, auditable, explainable prioritization with zero hallucination in emergency dispatch ranking.
+- **Trade-off:** Requires maintaining strict Pydantic schemas across the GenAI service and the math scoring engine.
