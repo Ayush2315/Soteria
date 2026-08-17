@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile for SOTERIA FastAPI Backend
-FROM python:3.11-slim as base
+FROM --platform=linux/amd64 python:3.11-slim as base
 
 # Prevent Python from writing .pyc files & buffer stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1 \

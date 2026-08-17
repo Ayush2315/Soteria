@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-soteria_db}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-soteria_db}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -30,6 +30,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: soteria_backend
     restart: unless-stopped
     depends_on:
