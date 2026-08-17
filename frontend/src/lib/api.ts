@@ -1,6 +1,6 @@
 /**
  * SOTERIA Backend API Client & TypeScript Interfaces
- * Multimodal AI Ingestion, PostGIS Spatial Triage, and Responder Operations.
+ * Multimodal AI Ingestion, PostGIS Spatial Triage, WebSockets, and Responder Operations.
  */
 
 export interface DatabaseHealth {
@@ -125,7 +125,29 @@ export interface IncidentCreatePayload {
   is_offline_cached?: boolean;
 }
 
+export interface WebSocketIncidentEvent {
+  event: "CONNECTED" | "PONG" | "INCIDENT_CREATED" | "INCIDENT_UPDATED" | "TRIAGE_ALERT";
+  data?: Incident;
+  triage_breakdown?: TriageBreakdown;
+  message?: string;
+  active_clients?: number;
+  timestamp?: string;
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export function getWebSocketUrl(): string {
+  const wsUrlEnv = process.env.NEXT_PUBLIC_WS_URL;
+  if (wsUrlEnv) return wsUrlEnv;
+
+  if (typeof window !== "undefined") {
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const host = window.location.hostname;
+    // Connect to backend port 8000
+    return `${protocol}//${host}:8000/ws/incidents`;
+  }
+  return "ws://localhost:8000/ws/incidents";
+}
 
 export async function checkBackendHealth(): Promise<HealthCheck> {
   try {
@@ -140,7 +162,7 @@ export async function checkBackendHealth(): Promise<HealthCheck> {
   } catch (err: any) {
     return {
       app: "SOTERIA",
-      version: "0.2.0",
+      version: "0.3.0",
       status: "degraded",
       timestamp: new Date().toISOString(),
       environment: "client-fallback",
@@ -164,7 +186,7 @@ export async function fetchIncidents(): Promise<Incident[]> {
     }
     return await res.json();
   } catch {
-    // Return rich sample triage incidents for demonstration during initial startup
+    // Return sample triage incidents for demonstration during initial startup
     return [
       {
         id: 101,

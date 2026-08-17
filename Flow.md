@@ -10,13 +10,14 @@ This document details the high-level request lifecycle, AI extraction pipelines,
 flowchart TD
     subgraph Clients["1. Target User Clients"]
         Citizen["📱 Citizen SOS (PWA / Live Voice Note & Photo Upload)"]
-        Commander["🖥️ Commander GIS Dashboard (Heatmaps & Priority Feed)"]
+        Commander["🖥️ Commander 3D GIS Dashboard (Deck.gl WebGL & WebSocket Stream)"]
         Volunteer["🦺 Volunteer Response Hub (SOPs & AI Photo Closure)"]
     end
 
-    subgraph IngestionGateway["2. Ingestion & Offline Sync Layer"]
+    subgraph IngestionGateway["2. Ingestion & WebSocket Broadcast Layer"]
         SyncQueue["IndexedDB Local Storage & Service Worker Queue"]
         APIGateway["FastAPI Async REST Gateway (:8000)"]
+        WSManager["FastAPI ConnectionManager WebSocket Stream (/ws/incidents)"]
     end
 
     subgraph IntelligenceLayer["3. Multimodal GenAI & Triage Engine"]
@@ -49,6 +50,9 @@ flowchart TD
     APIGateway -->|Persist SRID:4326 Geom & Triage| PostGIS
     PostGIS --- SpatialIndex
 
+    APIGateway -->|Trigger Real-Time Push| WSManager
+    WSManager -->|Instant JSON Broadcast| Commander
+
     PostGIS -->|Proximity Geo-Queries| ProximityMatcher
     ProximityMatcher -->|Dispatch Mission + SOP| Volunteer
     PostGIS -->|Periodic Incident Batch| SitRepCron
@@ -59,35 +63,37 @@ flowchart TD
 
 ---
 
-## 2. Milestone 2: Multimodal SOS Ingestion & AI Triage Sequence
+## 2. Milestone 3: Real-Time WebSocket & Deck.gl 3D GIS Lifecycle
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor C as Citizen / First Responder
+    actor C as Citizen / Responder
     participant NextJS as Next.js 14 Frontend
     participant API as FastAPI Backend (:8000)
-    participant Storage as /uploads Local Media Storage
-    participant Gemini as Google Gemini 1.5 Flash (google-genai)
+    participant WS as WebSocket Manager (/ws/incidents)
+    participant Gemini as Google Gemini 1.5 Flash
     participant Engine as 0-100 Triage Math Engine
     participant DB as PostgreSQL 16 + PostGIS (SRID 4326)
+    actor CMD as Commander (Deck.gl GIS)
 
-    C->>NextJS: 1. Speaks in regional dialect (e.g., Hindi/Bhojpuri) + snaps scene photo
-    NextJS->>API: 2. POST /api/v1/triage/multimodal (multipart/form-data)
-    API->>Storage: 3. Persist voice_sos.webm and scene_photo.jpg
-    alt Live Gemini API Key Configured
-        API->>Gemini: 4a. Stream Audio/Photo buffer + prompt + response_schema
-        Gemini-->>API: 5a. Structured JSON (Transcript, Translation, Hazard, Trapped, SOP)
-    else Zero-Key / Network Fallback
-        API->>API: 4b/5b. Heuristic Dialect Extractor & SOP Generator
+    CMD->>WS: 1. Connects to ws://localhost:8000/ws/incidents
+    WS-->>CMD: 2. Handshake: CONNECTED (Active Clients: 1)
+    C->>NextJS: 3. Citizen submits voice note SOS in regional dialect
+    NextJS->>API: 4. POST /api/v1/triage/multimodal (multipart/form-data)
+    API->>Gemini: 5. Extract structured entities, dialect translation, SOP
+    Gemini-->>API: 6. MultimodalGeminiExtraction JSON
+    API->>Engine: 7. calculate_triage_score(extraction) -> Score: 93.5 [CRITICAL_P1]
+    API->>DB: 8. INSERT incident with PostGIS geometry (SRID 4326)
+    DB-->>API: 9. Incident persisted (ID: 105)
+    API->>WS: 10. ws_manager.broadcast_incident("INCIDENT_CREATED", incident_data)
+    par Instant WebSocket Broadcast
+        WS-->>CMD: 11a. Push structured JSON payload to connected dashboard socket
+        CMD->>CMD: 12a. Synthesizes Web Audio chime & elevates 3D HexagonLayer column in Deck.gl
+    and HTTP 201 Response
+        API-->>NextJS: 11b. HTTP 201 MultimodalTriageResponse
+        NextJS->>C: 12b. Render LiveTriageResultCard
     end
-    API->>Engine: 6. calculate_triage_score(extraction, client_timestamp)
-    Note over Engine: Score = H_sev(35) + T_rap(25) + V_uln(25) + M_ed(10) + R_ec(5)
-    Engine-->>API: 7. TriageBreakdown (Score: 93.5, Tier: CRITICAL_P1)
-    API->>DB: 8. INSERT into incidents (geom: SRID=4326;POINT(lng lat), score: 93.5)
-    DB-->>API: 9. Incident record created (ID: 104)
-    API-->>NextJS: 10. HTTP 201 MultimodalTriageResponse
-    NextJS->>C: 11. Render LiveTriageResultCard & Live Feed in Commander View
 ```
 
 ---
@@ -118,26 +124,26 @@ sequenceDiagram
 
 ---
 
-## 4. PostGIS Hexagonal Risk Density & Spatial Clustering
+## 4. Deck.gl 3D Hexagonal Aggregation Layering
 
 ```
-                       [Incoming Incident Points (SRID:4326)]
-                                       │
-                                       ▼
-    ┌────────────────────────────────────────────────────────────────────────┐
-    │ PostGIS Spatial Binning Query:                                         │
-    │ SELECT ST_HexagonGrid(500, ST_SetSRID(ST_EstimatedExtent(...), 4326)) │
-    │ JOIN incidents ON ST_Intersects(geom, hex_geom)                        │
-    │ GROUP BY hex_geom                                                      │
-    │ CALCULATE: AVG(triage_score) * COUNT(incidents) = Risk Intensity       │
-    └────────────────────────────────────────────────────────────────────────┘
-                                       │
-                                       ▼
-                       [Real-Time Commander Heatmap]
-          ╔══════════════╦══════════════╦══════════════╗
-          ║  HEX-01: P4  ║  HEX-02: P1  ║  HEX-03: P2  ║
-          ║  Low (12.0)  ║ Critical(94) ║ Urgent (71)  ║
-          ╚══════════════╩══════════════╩══════════════╝
+                     [Incoming Real-Time Coordinates (SRID:4326)]
+                                          │
+                                          ▼
+     ┌─────────────────────────────────────────────────────────────────────────┐
+     │ Deck.gl HexagonLayer:                                                   │
+     │ Radius: 500m | Extruded: True | ElevationScale: 15 | Coverage: 0.9      │
+     │ Aggregates incident counts & composite triage scores into 3D columns    │
+     │ Color Range: Emerald (#10B981) -> Amber (#F59E0B) -> Red (#EF4444)      │
+     └─────────────────────────────────────────────────────────────────────────┘
+                                          │
+                                          ▼
+                     [Deck.gl WebGL Canvas + CartoDB Dark Matter]
+           ╔══════════════╦══════════════╦══════════════╗
+           ║  HEX-01: P4  ║  HEX-02: P1  ║  HEX-03: P2  ║
+           ║  Low (12.0)  ║ Critical(94) ║ Urgent (71)  ║
+           ║  Flat 2D     ║ 3D Extruded  ║ Mid Elevation║
+           ╚══════════════╩══════════════╩══════════════╝
 ```
 
 ---

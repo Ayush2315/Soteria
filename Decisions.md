@@ -124,3 +124,24 @@ We decoupled **Multimodal Intelligence Extraction** (handled by Google Gemini 1.
 ### Consequences
 - **Positive:** 100% reproducible, auditable, explainable prioritization with zero hallucination in emergency dispatch ranking.
 - **Trade-off:** Requires maintaining strict Pydantic schemas across the GenAI service and the math scoring engine.
+
+---
+
+## ADR 006: Deck.gl WebGL Hexagonal GIS Layering & Real-Time WebSocket Synchronization
+
+### Context & Problem Statement
+Traditional 2D mapping tools (Leaflet, standard Mapbox markers) struggle when rendering thousands of disaster points in dense casualty sectors, causing browser UI lag and cognitive clutter for commanders. Furthermore, HTTP polling (`setInterval` polling) introduces 15–30 second latency in emergency dispatch and overloads server connection pools.
+
+### Decision
+We adopted **Deck.gl** (`@deck.gl/react`, `@deck.gl/aggregation-layers`) with **MapLibre GL** and **CartoDB Dark Matter** open-access vector tiles for the frontend GIS layer, coupled with a persistent **FastAPI WebSocket** (`/ws/incidents`) broadcast architecture.
+
+### Rationale
+- **Hardware-Accelerated WebGL Rendering:** Deck.gl offloads spatial point rendering and 3D geometric calculations directly to the client GPU, effortlessly handling 100,000+ spatial points at 60 FPS.
+- **3D Hexagonal Risk Density (`HexagonLayer`):** Dynamically clusters incident points into 500m hexagonal bins with 3D extruded columns. Column height represents cumulative urgency while color ramp represents severity tier.
+- **Zero-Key Base Map:** CartoDB Dark Matter tiles (`https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json`) provide a high-contrast emergency theme without external API key quotas, billing limits, or credit card dependencies.
+- **Sub-100ms WebSocket Broadcasts:** As soon as an incident is validated and stored in PostGIS, FastAPI pushes the structured JSON event to all connected dashboard sockets, eliminating polling latency.
+- **Audio Alarm Synthesis:** Uses native browser Web Audio API to synthesize emergency chimes on `CRITICAL_P1` incoming alerts with zero external audio assets.
+
+### Consequences
+- **Positive:** Sub-second situational awareness, 3D spatial hotspot visualization, zero map API dependencies, and high-performance WebGL rendering.
+- **Trade-off:** Requires dynamic client-side loading (`ssr: false`) in Next.js to prevent server-side WebGL canvas initialization errors.

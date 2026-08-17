@@ -1,15 +1,16 @@
 """
-Incident Ingestion, Retrieval, and Triage Management Endpoints.
+Incident Ingestion, Retrieval, and Triage Management Endpoints with WebSocket Broadcasts.
 """
 from typing import List, Optional
 from datetime import datetime
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
-from geoalchemy2.elements import WKTElement
 
 from app.core.database import get_db
 from app.core.config import settings
+from app.core.websockets import ws_manager
 from app.models.incident import Incident, SourceType, TriageCategory, IncidentStatus
 from app.schemas.incident import (
     IncidentCreate,
@@ -17,28 +18,28 @@ from app.schemas.incident import (
     IncidentUpdate,
 )
 
+logger = logging.getLogger("soteria.api.incidents")
 router = APIRouter()
 
 
 def _compute_preliminary_triage(payload: IncidentCreate) -> tuple[float, TriageCategory, dict, dict]:
     """
-    Computes a baseline heuristic triage score (0-100) and structured safety brief
-    while the Gemini Multimodal AI pipeline is connected in Milestone 2.
+    Computes a baseline heuristic triage score (0-100) and structured safety brief.
     """
     text_content = (payload.raw_payload or "").lower()
     score = 30.0  # Base priority score
     medical_needs = []
     hazard_types = []
     trapped_count = 0
-    vulnerable = {"elderly": 0, "children": 0, "disabled": 0}
+    vulnerable = {"elderly": 0, "children": 0, "pregnant": 0, "disabled": 0}
 
     # Keyword heuristics for high-urgency disaster distress
-    if any(k in text_content for k in ["trapped", "stuck", "buried", "collapse", "drowning", "roof"]):
+    if any(k in text_content for k in ["trapped", "stuck", "buried", "collapse", "drowning", "roof", "fase"]):
         score += 35.0
         trapped_count = 2
         hazard_types.append("STRUCTURAL_COLLAPSE")
 
-    if any(k in text_content for k in ["flood", "water rising", "water level", "current", "overflow"]):
+    if any(k in text_content for k in ["flood", "water rising", "water level", "current", "overflow", "baadh", "pani"]):
         score += 20.0
         hazard_types.append("RAPID_FLOOD")
 
@@ -66,8 +67,11 @@ def _compute_preliminary_triage(payload: IncidentCreate) -> tuple[float, TriageC
 
     extracted_entities = {
         "trapped_count": trapped_count,
+        "is_trapped": trapped_count > 0,
         "medical_needs": medical_needs or ["GENERAL_EVALUATION"],
         "hazard_types": hazard_types or ["GENERAL_DISASTER_ZONE"],
+        "hazard_severity": int(final_score / 10),
+        "people_affected": max(1, trapped_count + vulnerable["children"] + vulnerable["elderly"]),
         "vulnerable_people": vulnerable,
         "detected_language": "en",
         "confidence_score": 0.92,
@@ -97,8 +101,8 @@ def _compute_preliminary_triage(payload: IncidentCreate) -> tuple[float, TriageC
     "/",
     response_model=IncidentRead,
     status_code=status.HTTP_201_CREATED,
-    summary="Ingest Multimodal Disaster Distress Signal",
-    description="Ingests voice notes, photos, or text SOS signals, applies geospatial projection, computes automated triage score, and logs incident.",
+    summary="Ingest Disaster Distress Signal (JSON)",
+    description="Ingests JSON distress signal, computes triage score, persists in PostGIS, and broadcasts via WebSockets.",
 )
 async def create_incident(
     incident_in: IncidentCreate,
@@ -106,8 +110,7 @@ async def create_incident(
 ) -> IncidentRead:
     triage_score, triage_category, entities, sop = _compute_preliminary_triage(incident_in)
 
-    # Convert coordinates to PostGIS WKT Point (EPSG: 4326)
-    # PostGIS Point format: POINT(longitude latitude)
+    # PostGIS Point format: SRID=4326;POINT(longitude latitude)
     point_wkt = f"SRID=4326;POINT({incident_in.longitude} {incident_in.latitude})"
 
     db_incident = Incident(
@@ -131,7 +134,19 @@ async def create_incident(
     db.add(db_incident)
     await db.commit()
     await db.refresh(db_incident)
-    return db_incident
+
+    incident_read = IncidentRead.model_validate(db_incident)
+
+    # Broadcast to WebSocket subscribers
+    try:
+        await ws_manager.broadcast_incident(
+            event_type="INCIDENT_CREATED",
+            incident_data=incident_read.model_dump(mode="json"),
+        )
+    except Exception as e:
+        logger.warning(f"Failed to broadcast WebSocket event: {e}")
+
+    return incident_read
 
 
 @router.get(
@@ -216,4 +231,16 @@ async def update_incident(
     incident.updated_at = datetime.utcnow()
     await db.commit()
     await db.refresh(incident)
-    return incident
+
+    incident_read = IncidentRead.model_validate(incident)
+
+    # Broadcast update event to all connected dashboards
+    try:
+        await ws_manager.broadcast_incident(
+            event_type="INCIDENT_UPDATED",
+            incident_data=incident_read.model_dump(mode="json"),
+        )
+    except Exception as e:
+        logger.warning(f"Failed to broadcast WebSocket update event: {e}")
+
+    return incident_read

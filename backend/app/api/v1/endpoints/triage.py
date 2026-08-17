@@ -1,6 +1,7 @@
 """
 Multimodal GenAI Triage Ingestion and Urgency Analysis Endpoints.
-Processes audio recordings, disaster photos, and text distress signals in a single unified flow.
+Processes audio recordings, disaster photos, and text distress signals in a single unified flow,
+persists in PostGIS, and broadcasts in real time via WebSockets.
 """
 from typing import Optional
 from datetime import datetime
@@ -12,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.config import settings
+from app.core.websockets import ws_manager
 from app.models.incident import Incident, SourceType, IncidentStatus
 from app.schemas.incident import (
     IncidentRead,
@@ -28,11 +30,12 @@ router = APIRouter()
     "/multimodal",
     response_model=MultimodalTriageResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Ingest Multimodal SOS (Voice, Photo, Text) with GenAI Triage & PostGIS Persistence",
+    summary="Ingest Multimodal SOS (Voice, Photo, Text) with GenAI Triage, PostGIS Persistence & WebSocket Broadcast",
     description=(
         "Accepts multipart/form-data containing emergency audio notes, scene photos, and text signals. "
         "Streams to Google Gemini for dialect translation, entity extraction, and 3-bullet SOP generation. "
-        "Applies a deterministic 0-100 triage urgency algorithm and persists the spatial record in PostGIS."
+        "Applies a deterministic 0-100 triage urgency algorithm, persists in PostGIS, and instantly "
+        "broadcasts the structured incident to connected Next.js Deck.gl GIS dashboards."
     ),
 )
 async def triage_multimodal_distress(
@@ -188,8 +191,20 @@ async def triage_multimodal_distress(
         f"[{triage_breakdown.triage_category.value}] at ({latitude}, {longitude})"
     )
 
+    incident_read = IncidentRead.model_validate(db_incident)
+
+    # 8. Real-Time WebSocket Broadcast to Commander GIS Dashboards
+    try:
+        await ws_manager.broadcast_incident(
+            event_type="INCIDENT_CREATED",
+            incident_data=incident_read.model_dump(mode="json"),
+            triage_breakdown=triage_breakdown.model_dump(mode="json"),
+        )
+    except Exception as ws_err:
+        logger.warning(f"WebSocket broadcast non-fatal exception: {ws_err}")
+
     return MultimodalTriageResponse(
-        incident=IncidentRead.model_validate(db_incident),
+        incident=incident_read,
         extraction=extraction,
         triage_breakdown=triage_breakdown,
         audio_playback_url=audio_url,

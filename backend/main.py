@@ -5,13 +5,14 @@ Offline-First Multimodal AI Disaster Triage Platform.
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, status
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.database import init_db
+from app.core.websockets import ws_manager
 from app.api.v1.router import api_router
 
 # Configure logging
@@ -32,7 +33,7 @@ async def lifespan(app: FastAPI):
     # Ensure static uploads directory exists
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     logger.info(f"Mounted static upload directory at: {settings.UPLOAD_DIR}")
-    
+
     # Initialize PostGIS extension and database tables asynchronously
     await init_db()
     yield
@@ -47,7 +48,7 @@ app = FastAPI(
         "Transforms chaotic distress voice notes, photos, and text into prioritized, "
         "geospatially clustered rescue missions with dynamic volunteer safety briefings."
     ),
-    version="0.2.0",
+    version="0.3.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
@@ -95,13 +96,35 @@ async def root_info():
         "tagline": "From Chaos to Clarity — Disaster Response at the Speed of AI",
         "team": "Team Soteria: Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee",
         "competition": "Automate India 2026 — NIET Chapter",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "docs": "/docs",
         "api_v1": settings.API_V1_STR,
         "health": f"{settings.API_V1_STR}/health",
         "incidents": f"{settings.API_V1_STR}/incidents",
         "triage": f"{settings.API_V1_STR}/triage/multimodal",
+        "websockets": "/ws/incidents",
     }
+
+
+# --- Real-Time Disaster Dispatch WebSocket Endpoints ---
+@app.websocket("/ws/incidents")
+@app.websocket(f"{settings.API_V1_STR}/ws/incidents")
+async def websocket_incident_feed(websocket: WebSocket):
+    """
+    WebSocket endpoint streaming live incident updates, GenAI triage scores, and responder dispatches.
+    """
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            # Receive client ping or heartbeat messages
+            data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_json({"event": "PONG", "status": "active"})
+    except WebSocketDisconnect:
+        await ws_manager.disconnect(websocket)
+    except Exception as e:
+        logger.warning(f"WebSocket client connection error: {e}")
+        await ws_manager.disconnect(websocket)
 
 
 # Mount API v1 Router
