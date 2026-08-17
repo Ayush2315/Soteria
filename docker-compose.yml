@@ -1,0 +1,86 @@
+services:
+  # ============================================================================
+  # 1. DATABASE SERVICE: PostgreSQL with PostGIS Spatial Extension
+  # ============================================================================
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: soteria_postgis_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-soteria_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-soteria_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - soteria_network
+
+  # ============================================================================
+  # 2. BACKEND SERVICE: FastAPI Python 3.11+ Asynchronous REST API
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: soteria_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ENV=${ENV:-development}
+      - DEBUG=${DEBUG:-True}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-soteria_db}
+      - DATABASE_URL_SYNC=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-soteria_db}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-flash}
+      - CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000"]
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - soteria_network
+
+  # ============================================================================
+  # 3. FRONTEND SERVICE: Next.js 14 App Router + Tailwind CSS PWA & Command Center
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: soteria_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_MAPBOX_TOKEN=${NEXT_PUBLIC_MAPBOX_TOKEN:-}
+      - NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-development}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - soteria_network
+
+volumes:
+  postgres_data:
+    name: soteria_postgres_data
+    driver: local
+
+networks:
+  soteria_network:
+    name: soteria_network
+    driver: bridge
