@@ -10,6 +10,27 @@ from app.schemas.incident import (
     IncidentFilterParams,
     SafetySOPResponse,
     TriageBreakdown,
+    MultimodalGeminiExtraction,
+    MultimodalTriageResponse,
+)
+from app.schemas.volunteer import (
+    VolunteerBase,
+    VolunteerCreate,
+    VolunteerUpdate,
+    VolunteerRead,
+    VolunteerWithDistance,
+)
+from app.schemas.dispatch import (
+    DispatchNearbyQuery,
+    DispatchAssignRequest,
+    DispatchAssignResponse,
+    RescueVerificationAuditResult,
+    RescueVerificationResponse,
+)
+from app.schemas.sitrep import (
+    SitRepSummary,
+    SitRepResponse,
+    CommandStats,
 )
 
 __all__ = [
@@ -21,4 +42,20 @@ __all__ = [
     "IncidentFilterParams",
     "SafetySOPResponse",
     "TriageBreakdown",
+    "MultimodalGeminiExtraction",
+    "MultimodalTriageResponse",
+    "VolunteerBase",
+    "VolunteerCreate",
+    "VolunteerUpdate",
+    "VolunteerRead",
+    "VolunteerWithDistance",
+    "DispatchNearbyQuery",
+    "DispatchAssignRequest",
+    "DispatchAssignResponse",
+    "RescueVerificationAuditResult",
+    "RescueVerificationResponse",
+    "SitRepSummary",
+    "SitRepResponse",
+    "CommandStats",
 ]
+

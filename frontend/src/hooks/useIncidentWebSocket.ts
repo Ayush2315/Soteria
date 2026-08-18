@@ -5,7 +5,6 @@ import {
   Incident,
   WebSocketIncidentEvent,
   getWebSocketUrl,
-  MultimodalTriageResponse,
 } from "@/lib/api";
 
 /**
@@ -122,9 +121,14 @@ export function useIncidentWebSocket(initialIncidents: Incident[] = []) {
             if (newIncident.triage_category === "CRITICAL_P1") {
               playEmergencyChime();
             }
-          } else if (payload.event === "INCIDENT_UPDATED" && payload.data) {
+          } else if (
+            (payload.event === "INCIDENT_UPDATED" ||
+              payload.event === "DISPATCH_ASSIGNED" ||
+              payload.event === "INCIDENT_RESOLVED") &&
+            payload.data
+          ) {
             const updated = payload.data;
-            console.log(`[SOTERIA WS] Updated Incident #${updated.id} status: ${updated.status}`);
+            console.log(`[SOTERIA WS] Event ${payload.event}: Incident #${updated.id} status is now ${updated.status}`);
 
             setIncidents((prev) =>
               prev.map((item) => (item.id === updated.id ? updated : item))

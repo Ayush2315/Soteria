@@ -171,3 +171,76 @@ sequenceDiagram
                   ▼
 [Broadcast SitRep to Emergency Commanders via Webhook & Dashboard]
 ```
+
+---
+
+## 6. Offline-First IndexedDB Caching & Auto-Sync Lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as 📱 Citizen (Dead-Zone)
+    participant Form as CitizenSOSForm (PWA)
+    participant IDB as IndexedDB (soteria_offline_db)
+    participant Hook as useOfflineSync Hook
+    participant API as FastAPI Backend (:8000)
+    participant Gemini as Google GenAI Multimodal
+    participant DB as PostgreSQL + PostGIS (SRID 4326)
+    participant WS as WebSocket Stream (/ws/incidents)
+    actor CMD as Commander (3D GIS Map)
+
+    C->>Form: 1. Records voice SOS note & attaches scene photo
+    Note over C,Form: Cellular network DOWN (navigator.onLine === false)
+    Form->>IDB: 2. storeOfflineDistress({ audioBlob, imageBlob, lat, lng, text })
+    IDB-->>Form: 3. Payload queued with ID #OFF-101
+    Form-->>C: 4. Offline banner: "Distress Queued Safely. Will auto-sync on reconnect."
+
+    Note over C,Hook: Cell signal restored! (online event fires)
+    Hook->>IDB: 5. getPendingDistressQueue()
+    IDB-->>Hook: 6. Returns [#OFF-101]
+    Hook->>API: 7. POST /api/v1/triage/multimodal (FormData with is_offline_cached=true)
+    API->>Gemini: 8. Extract dialect transcript, entities & Safety SOP
+    Gemini-->>API: 9. MultimodalGeminiExtraction JSON
+    API->>DB: 10. INSERT incident (SRID 4326, is_offline_cached=true)
+    DB-->>API: 11. Incident persisted (#106)
+    API->>WS: 12. ws_manager.broadcast_incident("INCIDENT_CREATED", incident_data)
+    WS-->>CMD: 13. Commander Map updates in real-time
+    API-->>Hook: 14. HTTP 201 Response
+    Hook->>IDB: 15. removeQueuedDistress(#OFF-101)
+    Hook-->>C: 16. Toast: "Offline emergency distress report successfully synced!"
+```
+
+---
+
+## 7. AI Closed-Loop Photo Verification & Closure Lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Vol as 🦺 Field Volunteer
+    participant VHub as Volunteer Hub UI
+    participant API as FastAPI Backend (:8000)
+    participant Gemini as Gemini 1.5 Flash Vision
+    participant DB as PostgreSQL + PostGIS (SRID 4326)
+    participant WS as WebSocket Stream (/ws/incidents)
+    actor CMD as Commander (3D GIS Map)
+
+    Vol->>VHub: 1. Completes rescue, captures post-action resolution photo & notes
+    VHub->>API: 2. POST /api/v1/dispatch/verify (incident_id, photo, notes)
+    API->>DB: 3. Fetch initial hazard context & description
+    DB-->>API: 4. Initial hazard: "FLOOD / 4 trapped on roof"
+    API->>Gemini: 5. Audit resolution photo against initial hazard
+    Note over API,Gemini: Gemini Vision inspects image: verifies water receded, casualties safe
+    Gemini-->>API: 6. RescueVerificationAuditResult (is_verified: true, conf: 0.98, status: HAZARD_RESOLVED)
+    API->>DB: 7. UPDATE incident SET status = 'RESOLVED', verification_data = audit_result
+    API->>DB: 8. UPDATE volunteer SET status = 'AVAILABLE'
+    DB-->>API: 9. Transaction committed
+    API->>WS: 10. ws_manager.broadcast_incident("INCIDENT_RESOLVED", incident_data)
+    par Real-Time Push
+        WS-->>CMD: 11a. Incident badge turns green (RESOLVED) on Commander Map
+    and Verification Receipt
+        API-->>VHub: 11b. HTTP 200 RescueVerificationResponse
+        VHub-->>Vol: 12b. Renders AI Closed-Loop Verification Receipt (Confidence: 98%)
+    end
+```
+

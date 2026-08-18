@@ -125,7 +125,7 @@ export function DisasterGISMap({
     // 1. Deck.gl 3D HexagonLayer (Spatial Clustering & Risk Density)
     if (layerMode === "both" || layerMode === "hexagons") {
       activeLayers.push(
-        new HexagonLayer({
+        new HexagonLayer<Incident>({
           id: "hexagon-layer",
           data: incidents,
           pickable: true,
@@ -137,24 +137,28 @@ export function DisasterGISMap({
           getColorWeight: (d: Incident) => d.triage_score,
           getElevationWeight: (d: Incident) => d.triage_score,
           colorRange: HEXAGON_COLOR_RANGE,
-          onHover: (info: any) => setHoverInfo(info),
+          onHover: (info: any) => {
+            setHoverInfo(info);
+            return true;
+          },
           onClick: (info: any) => {
             if (info.object?.points?.[0]?.source && onSelectIncident) {
               onSelectIncident(info.object.points[0].source);
             }
+            return true;
           },
           updateTriggers: {
             elevationScale: [is3D, elevationScale],
             radius: [hexRadius],
           },
-        })
+        } as any)
       );
     }
 
     // 2. Deck.gl ScatterplotLayer (Incident Pinpoint & Focus Mode)
     if (layerMode === "both" || layerMode === "pins") {
       activeLayers.push(
-        new ScatterplotLayer({
+        new ScatterplotLayer<Incident>({
           id: "scatterplot-layer",
           data: incidents,
           pickable: true,
@@ -178,17 +182,21 @@ export function DisasterGISMap({
               ? [255, 255, 255, 255]
               : [0, 0, 0, 160],
           getLineWidth: (d: Incident) => (selectedIncident?.id === d.id ? 4 : 2),
-          onHover: (info: any) => setHoverInfo(info),
+          onHover: (info: any) => {
+            setHoverInfo(info);
+            return true;
+          },
           onClick: (info: any) => {
             if (info.object && onSelectIncident) {
               onSelectIncident(info.object as Incident);
             }
+            return true;
           },
           updateTriggers: {
             getLineColor: [selectedIncident?.id],
             getLineWidth: [selectedIncident?.id],
           },
-        })
+        } as any)
       );
     }
 
@@ -210,7 +218,6 @@ export function DisasterGISMap({
           reuseMaps
           mapLib={import("maplibre-gl")}
           mapStyle={CARTO_DARK_MATTER_STYLE}
-          preventStyleDiffing={true}
         />
       </DeckGL>
 

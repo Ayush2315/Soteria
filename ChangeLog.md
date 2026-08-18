@@ -4,6 +4,65 @@ All notable changes, architectural decisions, and package configurations across 
 
 ---
 
+## [Milestone 4] - Offline-First PWA, Volunteer Proximity Dispatch, AI Closed-Loop Verification & SitReps
+**Date:** 2026-08-18  
+**Status:** Completed  
+**Branch:** `feature/cartodb-gis-map`  
+**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Event:** Automate India 2026 — NIET Chapter
+
+### Added & Modified Components
+
+#### 1. Backend Service (`/backend`)
+- `app/schemas/volunteer.py`, `app/schemas/dispatch.py`, `app/schemas/sitrep.py` [NEW]:
+  - Pydantic models for volunteer tracking, spatial distance match queries, dispatch assignment, Gemini Vision photo audit receipts, and 3-bullet SitReps.
+- `app/services/dispatch_service.py` [NEW]:
+  - PostGIS spatial math queries (`ST_DWithin` / `ST_Distance` / Haversine) to compute nearest certified responders in meters/kilometers.
+  - State machine for volunteer assignment and status transitions (`AVAILABLE` $\to$ `DISPATCHED`).
+- `app/services/sitrep_service.py` [NEW]:
+  - Aggregates active vs. resolved incident clusters in PostGIS and prompts Gemini for structured 3-bullet operational summaries.
+- `app/services/gemini_service.py` [MODIFIED]:
+  - Added `verify_rescue_resolution` (Gemini Vision audit comparing resolution photo against initial hazard) and `generate_sitrep_summary`.
+- `app/api/v1/endpoints/dispatch.py` [NEW]:
+  - Mounted `/api/v1/dispatch/nearby`, `/api/v1/dispatch/assign`, `/api/v1/dispatch/verify`, and `/api/v1/dispatch/volunteers`.
+- `app/api/v1/endpoints/command.py` [NEW]:
+  - Mounted `/api/v1/command/sitrep` and `/api/v1/command/stats`.
+- `app/api/v1/router.py` [MODIFIED]:
+  - Registered `dispatch` and `command` routers.
+- `seed_disaster_data.py` [NEW]:
+  - 1-command deterministic database seeder with 8 Prayagraj certified field volunteers and 6 multi-hazard incidents across P1-P4 tiers.
+
+#### 2. Frontend Application (`/frontend`)
+- `public/manifest.json` & `public/sw.js` [NEW]:
+  - PWA manifest configuration and Service Worker for offline shell asset caching.
+- `src/lib/offlineStorage.ts` [NEW]:
+  - Native typed IndexedDB storage engine (`soteria_offline_db`) queueing audio/photo Blobs and distress forms in dead-zones.
+- `src/hooks/useOfflineSync.ts` [NEW]:
+  - Background synchronization hook listening for `online` reconnection events and auto-flushing queued reports.
+- `src/components/OfflineBanner.tsx` [NEW]:
+  - Top notification banner displaying offline state, pending queue count, and manual sync trigger.
+- `src/components/VolunteerDispatchDrawer.tsx` [NEW]:
+  - Commander responder dispatch drawer with PostGIS proximity ranking, skill badges, and dynamic 3-bullet AI Safety SOP briefing.
+- `src/components/VolunteerVerificationCard.tsx` [NEW]:
+  - Interactive photo proof-of-action upload and Gemini Vision audit receipt with confidence rating.
+- `src/components/SitRepModal.tsx` [NEW]:
+  - 30-minute automated 3-bullet executive operational briefing modal and on-demand synthesis trigger.
+- `src/components/CitizenSOSForm.tsx` [MODIFIED]:
+  - Wired seamless IndexedDB offline queueing fallback when cellular connectivity drops.
+- `src/hooks/useIncidentWebSocket.ts` [MODIFIED]:
+  - Added support for `DISPATCH_ASSIGNED` and `INCIDENT_RESOLVED` events.
+- `src/lib/api.ts` [MODIFIED]:
+  - Added typed API callers for dispatch, verification, volunteers, and SitReps.
+- `src/app/layout.tsx` & `src/app/page.tsx` [MODIFIED]:
+  - Registered Service Worker and wired all new modals, drawer, and verification widgets.
+
+#### 3. Architecture Documentation
+- `Decisions.md`: Added ADR 007 (Offline-First IndexedDB Architecture & Closed-Loop Vision Audit).
+- `Flow.md`: Added sequence diagrams for Offline Sync and AI Closed-Loop Photo Verification.
+- `README.md`: Updated with Milestone 4 features, 1-command seed instructions, and end-to-end judge evaluation guide.
+
+---
+
 ## [Milestone 3] - Real-Time Hexagonal GIS & WebSocket Synchronization
 **Date:** 2026-08-18  
 **Status:** Completed  

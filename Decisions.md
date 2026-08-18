@@ -145,3 +145,30 @@ We adopted **Deck.gl** (`@deck.gl/react`, `@deck.gl/aggregation-layers`) with **
 ### Consequences
 - **Positive:** Sub-second situational awareness, 3D spatial hotspot visualization, zero map API dependencies, and high-performance WebGL rendering.
 - **Trade-off:** Requires dynamic client-side loading (`ssr: false`) in Next.js to prevent server-side WebGL canvas initialization errors.
+
+---
+
+## ADR 007: Offline-First Client Architecture (IndexedDB & Service Workers), Volunteer Spatial Dispatch, and Closed-Loop Vision Verification
+
+### Context & Problem Statement
+Disaster victims and field responders operate under degraded or non-existent cellular infrastructure (power grid collapses, tower submersion). Standard web applications fail immediately when `fetch()` fails. Furthermore, emergency commanders require automated, sub-second nearest-neighbor spatial matching for certified volunteers, and an objective, closed-loop verification mechanism to ensure dispatched tasks are actually completed before tickets are closed.
+
+### Decision
+We implemented a three-tier resilience and dispatch architecture:
+1. **Client-Side Offline Engine (IndexedDB & Service Workers):**
+   - Implemented `soteria_offline_db` with a typed object store (`pending_sos_queue`) capable of storing raw audio Blobs, photos, and GPS metadata client-side.
+   - PWA Service Worker (`/sw.js`) pre-caches core static application shell assets.
+   - Auto-flush background listener (`useOfflineSync`) monitors `window.addEventListener('online')` and automatically bursts queued emergency payloads to `POST /api/v1/triage/multimodal` with `is_offline_cached: true`.
+2. **PostGIS Geodesic Proximity Dispatch:**
+   - Implemented `POST /api/v1/dispatch/nearby` and `/api/v1/dispatch/assign` using PostGIS spatial math (`ST_DWithin` / `ST_Distance`) to compute nearest available certified responders.
+   - Attached dynamic 3-bullet AI Safety SOP briefings to dispatch directives.
+3. **Google GenAI Vision Closed-Loop Verification (`/api/v1/dispatch/verify`):**
+   - Field volunteers upload post-rescue proof photos.
+   - Google Gemini Vision audits the photo evidence against the initial hazard profile to output an explainable verification verdict (`HAZARD_RESOLVED`), updates PostGIS status to `RESOLVED`, and broadcasts the resolution over WebSockets.
+4. **Automated 30-Minute SitRep Synthesis Engine (`/api/v1/command/sitrep`):**
+   - Periodically aggregates active vs. resolved incident clusters in PostGIS and prompts Gemini to generate a structured 3-bullet executive operational briefing.
+
+### Consequences
+- **Positive:** Zero data loss in dead-zones, instant geodesic volunteer matching, hallucination-resistant photo closure audits, and automated executive operational awareness.
+- **Trade-off:** Client storage is bounded by browser IndexedDB quotas (~50MB-1GB depending on device).
+
