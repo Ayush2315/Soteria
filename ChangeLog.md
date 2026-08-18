@@ -8,7 +8,7 @@ All notable changes, architectural decisions, and package configurations across 
 **Date:** 2026-08-19  
 **Status:** Completed  
 **Branch:** `feature/cartodb-gis-map`  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter
 
 ### Added & Modified Components
@@ -51,7 +51,7 @@ All notable changes, architectural decisions, and package configurations across 
 **Date:** 2026-08-19  
 **Status:** Completed  
 **Branch:** `feature/cartodb-gis-map`  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter
 
 ### Added & Modified Components
@@ -90,7 +90,7 @@ All notable changes, architectural decisions, and package configurations across 
 **Date:** 2026-08-19  
 **Status:** Completed  
 **Branch:** `feature/cartodb-gis-map`  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter
 
 ### Added & Modified Components
@@ -130,7 +130,7 @@ All notable changes, architectural decisions, and package configurations across 
 **Date:** 2026-08-18  
 **Status:** Completed  
 **Branch:** `feature/cartodb-gis-map`  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter
 
 ### Added & Modified Components
@@ -189,7 +189,7 @@ All notable changes, architectural decisions, and package configurations across 
 **Date:** 2026-08-18  
 **Status:** Completed  
 **Branch:** `feature/cartodb-gis-map`  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter
 
 ### Added & Modified Components
@@ -236,7 +236,7 @@ All notable changes, architectural decisions, and package configurations across 
 ## [Milestone 2] - Multimodal GenAI Extraction & Urgency Triage Engine
 **Date:** 2026-08-18  
 **Status:** Completed  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter
 
 ---
@@ -244,5 +244,5 @@ All notable changes, architectural decisions, and package configurations across 
 ## [Milestone 1] - Initial Foundation, Docker Environment, Base Skeletons, and Core Architecture
 **Date:** 2026-08-17  
 **Status:** Completed  
-**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Team:** Team Aflatoon (Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee)  
 **Event:** Automate India 2026 — NIET Chapter

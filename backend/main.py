@@ -94,7 +94,8 @@ async def root_info():
     return {
         "name": settings.APP_NAME,
         "tagline": "From Chaos to Clarity — Disaster Response at the Speed of AI",
-        "team": "Team Soteria: Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee",
+        "team": "Team Aflatoon: Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee",
+        "project": "SOTERIA — Offline-First Multimodal AI Disaster Triage Platform",
         "competition": "Automate India 2026 — NIET Chapter",
         "version": "0.3.0",
         "docs": "/docs",

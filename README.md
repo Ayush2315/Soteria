@@ -12,13 +12,14 @@
 
 ---
 
-## 👥 Team Soteria
+## 👥 Team Aflatoon
 - **Aryan Singh**
 - **Ayush Kumar Singh**
 - **Ayush Bhatt**
 - **Abhijeet Mukherjee**
 
 *Automate India 2026 — NIET Chapter*
+*Project: SOTERIA — Offline-First Multimodal AI Disaster Triage Platform*
 
 ---
 
@@ -290,5 +291,5 @@ The login gateway includes **1-Click Evaluator Buttons** for instant login:
 ---
 
 ## 📄 License & Compliance
-Developed for **Automate India 2026 (NIET Chapter)** by Team Soteria.  
+Developed for **Automate India 2026 (NIET Chapter)** by **Team Aflatoon** (Project: SOTERIA).  
 Released under the **MIT Open Source License**.
