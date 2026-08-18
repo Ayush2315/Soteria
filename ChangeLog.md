@@ -4,7 +4,129 @@ All notable changes, architectural decisions, and package configurations across 
 
 ---
 
-## [Milestone 4] - Offline-First PWA, Volunteer Proximity Dispatch, AI Closed-Loop Verification & SitReps
+## [Milestone 7] - Multi-Volunteer Dispatch, Recon Approvals, Dynamic Quotas & Relief Supply Drops
+**Date:** 2026-08-19  
+**Status:** Completed  
+**Branch:** `feature/cartodb-gis-map`  
+**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Event:** Automate India 2026 — NIET Chapter
+
+### Added & Modified Components
+
+#### 1. Backend Service (`/backend`)
+- `app/schemas/dispatch.py`:
+  - Extended `DispatchAssignRequest` and `DispatchAssignResponse` with `volunteer_ids: Optional[List[int]]` and `volunteers: Optional[List[VolunteerRead]]`.
+- `app/services/dispatch_service.py`:
+  - Updated PostGIS proximity search to return all nearby responders with live statuses (`AVAILABLE` vs `DISPATCHED`).
+  - Added batch multi-volunteer dispatch assignment with atomic database transactions.
+- `app/api/v1/endpoints/relief.py`:
+  - `POST /api/v1/relief/tasks/{task_id}/volunteer`: Atomic join/leave quota balancing for field volunteer tasks.
+  - `GET /api/v1/relief/nominated-spots`: Status-filtered crowdsourced supply drop spots.
+  - `POST /api/v1/relief/dispatch-supply`: Command HQ 1-click supply airdrop/convoy deployment with tracking codes.
+  - `POST /api/v1/relief/verify-spot`: Volunteer ground recon approval persisting to `APPROVED_ACTIVE` and marking recon tasks as `APPROVED_SAFE`.
+
+#### 2. Frontend Application (`/frontend`)
+- `src/components/VolunteerDispatchDrawer.tsx`:
+  - Multi-select checkboxes for batch volunteer dispatching.
+  - `🟢 AVAILABLE` vs `🟡 ACTIVE ON MISSION` status badges with busy reassignment warning banners.
+  - Quick action buttons `[ Select Available ]` and `[ Clear ]`.
+- `src/components/VolunteerVerificationCard.tsx`:
+  - Scoped state resets with `useEffect` on `incident.id` to prevent completion screen bleeding across tickets.
+  - Past resolution receipt display with re-audit toggle.
+- `src/components/stitch/StitchVolunteerHub.tsx`:
+  - Interactive `[ ✋ Volunteer for Mission (+1) ]` / `[ Joined (Click to Leave) ]` buttons updating live quotas.
+  - Ground recon spot approval form with instant optimistic safe airdrop badge.
+- `src/components/stitch/StitchHQCommander.tsx`:
+  - "Approved Crowdsourced Supply Drop Spots" modal with verified spots list and volunteer clearance receipts.
+  - 1-click supply payload checklist and transport selection (`Helicopter Airdrop`, `Rescue Boat Convoy`, `4x4 Amphibious Truck`).
+- `src/components/stitch/StitchCitizenPortal.tsx`:
+  - Safe Havens with exact GPS coordinates, elevation, and "🧭 Safe Path & Compass Navigation Guide" modal.
+  - Spot nomination receipt cards with generated Spot ID.
+- `src/lib/api.ts`:
+  - Added `volunteerForTask`, `fetchNominatedSpots`, `dispatchSupplyDrop`, and updated `assignVolunteer`.
+
+---
+
+## [Milestone 6] - Stitch AI Visual Redesign & Complete Multi-Role Disaster Hub Integration
+**Date:** 2026-08-19  
+**Status:** Completed  
+**Branch:** `feature/cartodb-gis-map`  
+**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Event:** Automate India 2026 — NIET Chapter
+
+### Added & Modified Components
+
+#### 1. Backend Service (`/backend`)
+- `app/api/v1/endpoints/relief.py` [NEW]:
+  - `GET /api/v1/relief/safe-havens`: Certified safe haven shelters with capacity quotas, medical readiness, and flood danger zones (`HZ-01` to `HZ-03`).
+  - `POST /api/v1/relief/nominate`: Hyperlocal supply drop spot nominations from citizens with elevation details.
+  - `GET /api/v1/relief/volunteer-tasks`: Field response missions with transparent Level 1-4 risk ratings, PPE requirements, and capacity quota balancing meters.
+  - `POST /api/v1/relief/verify-spot`: Field volunteer ground reconnaissance audits for nominated supply drop spots.
+- `app/api/v1/router.py` [MODIFIED]:
+  - Mounted `/relief` router under `/api/v1/relief`.
+
+#### 2. Frontend Application (`/frontend`)
+- `src/components/stitch/StitchHQCommander.tsx` [NEW]:
+  - 3-Pane Tactical Command layout with Left Strategic Ops Nav, Center 3D GIS Deck.gl radar map bounded canvas, top coordinate badges, bottom pulsing **P1 Critical Alert Ticker**, and Right Ops Triage Rail with active incident tickets and 1-click Proximity Dispatch.
+- `src/components/stitch/StitchCitizenPortal.tsx` [NEW]:
+  - 1-Tap Voice SOS with browser `MediaRecorder`, animated audio visualizer waves, disaster scene photo upload, and offline IndexedDB fallback.
+  - "Where to Go" live safe havens vs danger zones with capacity progress bars.
+  - Hyperlocal Supply Drop Spot nomination form.
+- `src/components/stitch/StitchVolunteerHub.tsx` [NEW]:
+  - Field missions with Level 1-4 risk badges and PPE requirements.
+  - Capacity quota balancing meters (`2/4 Needed`, `3/3 Full - Redirect`).
+  - Ground recon micro-task verification with approve/reject actions.
+  - AI closed-loop photo verification using `<VolunteerVerificationCard />` and Gemini Vision.
+- `src/lib/api.ts` [MODIFIED]:
+  - Added TypeScript interfaces and fetch helpers for relief, safe havens, and volunteer tasks.
+- `src/app/page.tsx` [MODIFIED]:
+  - Master coordinator seamlessly routing between Stitch views (`HQ_COMMANDER`, `CITIZEN`, `VOLUNTEER`) with auth state integration.
+- `tailwind.config.js` & `postcss.config.js` [NEW]:
+  - Configured dark/light color tokens, glowing animations, and CommonJS module compatibility.
+
+---
+
+## [Milestone 5] - JWT Authentication, Role-Based Access Control (RBAC) & Access Gateway
+**Date:** 2026-08-19  
+**Status:** Completed  
+**Branch:** `feature/cartodb-gis-map`  
+**Team:** Aryan Singh, Ayush Kumar Singh, Ayush Bhatt, Abhijeet Mukherjee  
+**Event:** Automate India 2026 — NIET Chapter
+
+### Added & Modified Components
+
+#### 1. Backend Service (`/backend`)
+- `app/models/user.py` [NEW]:
+  - SQLAlchemy `User` model with `UserRole` enum (`CITIZEN`, `VOLUNTEER`, `HQ_COMMANDER`), hashed password storage, phone, certifications list, and timestamps.
+- `app/schemas/user.py` [NEW]:
+  - Pydantic models for `UserCreate`, `UserLogin`, `UserResponse`, and `TokenResponse` with JWT token payloads.
+- `app/core/security.py` [NEW]:
+  - Password hashing and verification using native `bcrypt`.
+  - JWT token creation (`create_access_token`) and decoding (`decode_access_token`).
+  - FastAPI dependencies `get_current_user`, `get_current_user_optional`, and `require_roles()`.
+- `app/api/v1/endpoints/auth.py` [NEW]:
+  - Mounted `/api/v1/auth/register`, `/api/v1/auth/login`, and `/api/v1/auth/me`.
+- `app/api/v1/router.py` [MODIFIED]:
+  - Registered `/auth` router under `/api/v1/auth`.
+- `seed_disaster_data.py` [MODIFIED]:
+  - Seeded pre-configured accounts for `HQ_COMMANDER` (`commander@soteria.gov`), `VOLUNTEER` (`aarav.volunteer@soteria.org`), and `CITIZEN` (`citizen@soteria.org`).
+
+#### 2. Frontend Application (`/frontend`)
+- `src/lib/auth.tsx` [NEW]:
+  - React `AuthContext` provider and `useAuth()` hook for persistent session state, login, registration, logout, and 1-click demo helpers.
+- `src/components/AuthModal.tsx` [NEW]:
+  - Glassmorphic authentication modal with 1-click **"Fill Demo Commander"** and **"Fill Demo Volunteer"** buttons, error handling, and role selection.
+- `src/lib/api.ts` [MODIFIED]:
+  - Added `getAuthHeaders()` to inject `Authorization: Bearer <token>` into API requests and typed auth methods (`loginUser`, `registerUser`, `fetchCurrentUser`).
+- `src/app/layout.tsx` [MODIFIED]:
+  - Wrapped root component tree with `<AuthProvider>`.
+- `src/app/page.tsx` [MODIFIED]:
+  - Added authenticated user profile pill and Sign In / Sign Out actions in top header.
+  - Added role guards to Volunteer Hub and Commander Dispatch workflows while preserving friction-free guest access for Citizen SOS.
+
+#### 3. Architecture Documentation
+- `Decisions.md`: Added ADR 008 (Slack 3-Pane Disaster Ops Interface) and ADR 009 (JWT Role-Based Access Control & Access Gateway).
+
 **Date:** 2026-08-18  
 **Status:** Completed  
 **Branch:** `feature/cartodb-gis-map`  

@@ -155,13 +155,15 @@ export interface VolunteerWithDistance extends Volunteer {
 
 export interface DispatchAssignRequest {
   incident_id: number;
-  volunteer_id: number;
+  volunteer_id?: number;
+  volunteer_ids?: number[];
   notes?: string;
 }
 
 export interface DispatchAssignResponse {
   incident_id: number;
-  volunteer: Volunteer;
+  volunteer?: Volunteer;
+  volunteers?: Volunteer[];
   incident_status: string;
   safety_sop: Record<string, any>;
   assigned_at: string;
@@ -223,6 +225,25 @@ export interface CommandStats {
   system_status: string;
 }
 
+export interface SectorClusterMetrics {
+  totalIncidents: number;
+  maxTriageScore: number;
+  avgTriageScore: number;
+  totalTrappedCount: number;
+  criticalP1Count: number;
+  urgentP2Count: number;
+  moderateP3Count: number;
+  lowP4Count: number;
+}
+
+export interface SectorClusterData {
+  sectorName: string;
+  centroid: [number, number]; // [longitude, latitude]
+  metrics: SectorClusterMetrics;
+  incidents: Incident[];
+  isSinglePin: boolean;
+}
+
 export interface WebSocketIncidentEvent {
   event: "CONNECTED" | "PONG" | "INCIDENT_CREATED" | "INCIDENT_UPDATED" | "DISPATCH_ASSIGNED" | "INCIDENT_RESOLVED" | "TRIAGE_ALERT";
   data?: Incident;
@@ -231,6 +252,7 @@ export interface WebSocketIncidentEvent {
   active_clients?: number;
   timestamp?: string;
 }
+
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -537,17 +559,21 @@ export async function fetchNearbyVolunteers(
 
 export async function assignVolunteer(
   incidentId: number,
-  volunteerId: number,
+  volunteerIdOrIds: number | number[],
   notes?: string
 ): Promise<DispatchAssignResponse> {
+  const isArray = Array.isArray(volunteerIdOrIds);
+  const payload = {
+    incident_id: incidentId,
+    volunteer_id: isArray ? volunteerIdOrIds[0] : volunteerIdOrIds,
+    volunteer_ids: isArray ? volunteerIdOrIds : [volunteerIdOrIds],
+    notes: notes,
+  };
+
   const res = await fetch(`${API_BASE}/api/v1/dispatch/assign`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      incident_id: incidentId,
-      volunteer_id: volunteerId,
-      notes: notes,
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
@@ -631,3 +657,394 @@ export async function fetchCommandStats(): Promise<CommandStats> {
     };
   }
 }
+
+/* ========================================================================= */
+/* AUTHENTICATION & RBAC API METHODS */
+/* ========================================================================= */
+
+export type UserRole = "CITIZEN" | "VOLUNTEER" | "HQ_COMMANDER";
+
+export interface UserResponse {
+  id: number;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  phone?: string;
+  is_active: boolean;
+  certifications: string[];
+  created_at: string;
+}
+
+export interface UserLoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface UserRegisterPayload {
+  email: string;
+  password: string;
+  full_name: string;
+  role?: UserRole;
+  phone?: string;
+  certifications?: string[];
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+  role: UserRole;
+  user: UserResponse;
+}
+
+/**
+ * Returns Authorization header with JWT Bearer token from localStorage or argument.
+ */
+export function getAuthHeaders(explicitToken?: string | null): Record<string, string> {
+  const token = explicitToken || (typeof window !== "undefined" ? localStorage.getItem("soteria_access_token") : null);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function loginUser(payload: UserLoginPayload): Promise<TokenResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Login failed" }));
+    throw new Error(err.detail || "Authentication failed. Check your email and password.");
+  }
+
+  return await res.json();
+}
+
+export async function registerUser(payload: UserRegisterPayload): Promise<TokenResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Registration failed" }));
+    throw new Error(err.detail || "Registration failed. Try again.");
+  }
+
+  return await res.json();
+}
+
+export async function fetchCurrentUser(explicitToken?: string | null): Promise<UserResponse> {
+  const headers = getAuthHeaders(explicitToken);
+  const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
+    headers: {
+      ...headers,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch authenticated user profile");
+  }
+
+  return await res.json();
+}
+
+/* ========================================================================= */
+/* RELIEF OPERATIONS, SAFE HAVENS & VOLUNTEER TASKS */
+/* ========================================================================= */
+
+export interface SafeHaven {
+  id: string;
+  name: string;
+  type: string;
+  status: "OPEN_CAPACITY" | "NEAR_CAPACITY" | "FULL_REDIRECT";
+  capacity_total: number;
+  capacity_used: number;
+  latitude: number;
+  longitude: number;
+  elevation_meters?: number;
+  supplies: string[];
+  medical_team_on_site: boolean;
+  safe_zone_radius_meters: number;
+  distance_to_flood_meters: number;
+  safe_corridor_route?: string;
+}
+
+export interface HazardDangerZone {
+  id: string;
+  name: string;
+  hazard_type: string;
+  severity: string;
+  inundation_depth_meters: number;
+  active_advisory: string;
+  evacuation_status: string;
+}
+
+export interface SafeHavensResponse {
+  safe_havens: SafeHaven[];
+  hazard_danger_zones: HazardDangerZone[];
+  last_updated: string;
+}
+
+export interface NominatedSpot {
+  id: string;
+  spot_name: string;
+  latitude: number;
+  longitude: number;
+  terrain_type: string;
+  status: "PENDING_RECON" | "APPROVED_ACTIVE" | "REJECTED" | "SUPPLY_DISPATCHED";
+  nominated_by: string;
+  nominated_at: string;
+  accessibility_notes?: string;
+  cleared_by_volunteer?: string;
+  verified_at?: string;
+  last_supply_dispatch?: {
+    transport_type: string;
+    supplies: string[];
+    dispatched_at: string;
+    convoy_code: string;
+    notes?: string;
+  };
+}
+
+export interface VolunteerTask {
+  task_id: string;
+  title: string;
+  category: string;
+  risk_level: number;
+  risk_label: string;
+  required_ppe: string[];
+  sector: string;
+  required_volunteers: number;
+  current_volunteers: number;
+  status: "OPEN" | "QUOTA_FULL" | "IN_PROGRESS" | "APPROVED_SAFE";
+  description: string;
+  is_spot_recon?: boolean;
+  target_spot_id?: string;
+  volunteer_names?: string[];
+}
+
+export async function fetchSafeHavens(): Promise<SafeHavensResponse> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/relief/safe-havens`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch safe havens");
+    return await res.json();
+  } catch {
+    return {
+      safe_havens: [
+        {
+          id: "SH-01",
+          name: "Prayagraj Sports Complex Elevated Levee",
+          type: "ELEVATED_STADIUM",
+          status: "OPEN_CAPACITY",
+          capacity_total: 500,
+          capacity_used: 180,
+          latitude: 25.4425,
+          longitude: 81.8490,
+          elevation_meters: 104.5,
+          supplies: ["DRINKING_WATER", "RATIONS_48H", "BLANKETS", "POWER_GENERATOR"],
+          medical_team_on_site: true,
+          safe_zone_radius_meters: 450,
+          distance_to_flood_meters: 850,
+          safe_corridor_route: "Approach via MG Marg North bypass. Avoid riverfront embankment.",
+        },
+        {
+          id: "SH-02",
+          name: "Sharda Inter College Disaster Relief Camp",
+          type: "HIGH_SCHOOL_CAMP",
+          status: "NEAR_CAPACITY",
+          capacity_total: 250,
+          capacity_used: 235,
+          latitude: 25.4289,
+          longitude: 81.8541,
+          elevation_meters: 98.2,
+          supplies: ["DRINKING_WATER", "INFANT_NUTRITION", "PEDIATRIC_CARE"],
+          medical_team_on_site: true,
+          safe_zone_radius_meters: 300,
+          distance_to_flood_meters: 400,
+          safe_corridor_route: "Enter via Southern elevated overpass. Eastern lane is cordoned.",
+        },
+      ],
+      hazard_danger_zones: [
+        {
+          id: "HZ-01",
+          name: "North Ghat Riverfront Submersion Sector",
+          hazard_type: "FLOOD_CURRENT",
+          severity: "EXTREME_P1",
+          inundation_depth_meters: 3.8,
+          active_advisory: "Rooftop-level flooding with high-velocity current. DO NOT ATTEMPT WADING.",
+          evacuation_status: "IMMEDIATE_AIR_BOAT_EVACUATION",
+        },
+      ],
+      last_updated: new Date().toISOString(),
+    };
+  }
+}
+
+export async function nominateDropSpot(payload: {
+  spot_name: string;
+  latitude: number;
+  longitude: number;
+  terrain_type: string;
+  accessibility_notes?: string;
+  nominated_by_name?: string;
+  phone?: string;
+}): Promise<{ success: boolean; spot: NominatedSpot; task_id?: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/relief/nominate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to nominate drop spot");
+  }
+
+  return await res.json();
+}
+
+export async function fetchNominatedSpots(status?: string): Promise<NominatedSpot[]> {
+  try {
+    const url = status ? `${API_BASE}/api/v1/relief/nominated-spots?status=${status}` : `${API_BASE}/api/v1/relief/nominated-spots`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch nominated spots");
+    return await res.json();
+  } catch {
+    return [
+      {
+        id: "SPOT-102",
+        spot_name: "Daraganj Overbridge High Levee",
+        latitude: 25.4350,
+        longitude: 81.8590,
+        terrain_type: "ELEVATED_LEVEE",
+        status: "APPROVED_ACTIVE",
+        nominated_by: "Capt. Rajesh Verma",
+        nominated_at: "25 mins ago",
+        accessibility_notes: "Broad concrete embankment 4.5m above flood water. Boat tie-offs accessible.",
+        cleared_by_volunteer: "Capt. Aarav Sharma",
+        verified_at: "15 mins ago",
+      },
+    ];
+  }
+}
+
+export async function fetchVolunteerTasks(): Promise<VolunteerTask[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/relief/volunteer-tasks`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch volunteer tasks");
+    return await res.json();
+  } catch {
+    return [
+      {
+        task_id: "TASK-801",
+        title: "North Ghat Flood Rescue & Pediatric Life Vest Evacuation",
+        category: "WATER_RESCUE",
+        risk_level: 4,
+        risk_label: "Level 4: Extreme (Severe Flood Current)",
+        required_ppe: ["TYPE_V_PFD", "HELMET_WATER", "DRYSUIT", "THROW_LINE"],
+        sector: "North Ghat Sector 3",
+        required_volunteers: 4,
+        current_volunteers: 2,
+        status: "OPEN",
+        description: "Assisting 4 marooned casualties (infant + elderly) on submerged rooftop at North Ghat.",
+        volunteer_names: ["Vikram Singh", "Priya Nair"],
+      },
+      {
+        task_id: "TASK-802",
+        title: "Old City Masonry Wall Shoring & Power Cordon",
+        category: "STRUCTURAL_RESCUE",
+        risk_level: 3,
+        risk_label: "Level 3: High (Falling Debris + Live Arcing)",
+        required_ppe: ["HARD_HAT", "STEEL_TOE_BOOTS", "INSULATED_GLOVES", "HIGH_VIS_VEST"],
+        sector: "Old City Market Lane 4",
+        required_volunteers: 3,
+        current_volunteers: 3,
+        status: "QUOTA_FULL",
+        description: "Shoring unstable two-story masonry wall near sparking electrical transformer.",
+        volunteer_names: ["Rohit Mehra", "Anjali Verma", "Deepak Joshi"],
+      },
+      {
+        task_id: "TASK-803",
+        title: "Ground Recon: Inspect St. Peter Church Supply Drop Spot",
+        category: "SUPPLY_AIRDROP_RECON",
+        risk_level: 2,
+        risk_label: "Level 2: Moderate (Foot Reconnaissance)",
+        required_ppe: ["SAFETY_BOOTS", "HIGH_VIS_VEST", "WATERPROOF_RADIO"],
+        sector: "Sangam Grid Sector 2",
+        required_volunteers: 2,
+        current_volunteers: 0,
+        status: "OPEN",
+        description: "Inspect nominated spot #SPOT-101 for clear helicopter/boat airdrop clearance.",
+        is_spot_recon: true,
+        target_spot_id: "SPOT-101",
+        volunteer_names: [],
+      },
+    ];
+  }
+}
+
+export async function volunteerForTask(
+  taskId: string,
+  volunteerId: number,
+  action: "join" | "leave" = "join",
+  volunteerName?: string
+): Promise<{ success: boolean; task: VolunteerTask; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/relief/tasks/${taskId}/volunteer`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      volunteer_id: volunteerId,
+      volunteer_name: volunteerName,
+      action: action,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(errText || "Failed to update volunteer quota.");
+  }
+
+  return await res.json();
+}
+
+export async function verifyDropSpot(payload: {
+  spot_id: string;
+  volunteer_id: number;
+  volunteer_name?: string;
+  is_approved: boolean;
+  hazard_clearance_notes: string;
+  suitable_for_helicopter?: boolean;
+  suitable_for_boat?: boolean;
+}): Promise<{ success: boolean; spot_id: string; status: string; spot?: NominatedSpot; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/relief/verify-spot`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Failed to verify spot");
+  return await res.json();
+}
+
+export async function dispatchSupplyDrop(payload: {
+  spot_id: string;
+  supplies: string[];
+  transport_type: string;
+  notes?: string;
+}): Promise<{ success: boolean; spot: NominatedSpot; convoy_code: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/relief/dispatch-supply`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(errText || "Failed to dispatch supplies to spot.");
+  }
+
+  return await res.json();
+}
+
+

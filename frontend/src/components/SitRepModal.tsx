@@ -102,8 +102,9 @@ export function SitRepModal({ isOpen, onClose }: SitRepModalProps) {
             </button>
 
             <button
+              id="btn-close-sitrep"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

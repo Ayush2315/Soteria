@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "SOTERIA — Offline-First Multimodal AI Disaster Triage & GIS Platform",
@@ -30,9 +31,14 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-screen bg-[#090D16] text-slate-100 antialiased selection:bg-red-600 selection:text-white">
-        {children}
+      <body className="min-h-screen bg-[#071220] text-slate-100 antialiased selection:bg-cyan-600 selection:text-white">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `

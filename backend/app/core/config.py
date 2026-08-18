@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     APP_NAME: str = "SOTERIA"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = "soteria_super_secret_development_key_32chars_minimum"
+    SECRET_KEY: str = "soteria-super-secure-jwt-secret-key-2026"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours (1440 minutes)
 
     # Uploads & Media Storage
     UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")

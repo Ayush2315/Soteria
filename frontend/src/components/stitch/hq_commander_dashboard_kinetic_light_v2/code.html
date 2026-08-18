@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SOTERIA - Command HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#FF4F00",
+                    "primary-fixed-dim": "#FF8533",
+                    "on-primary": "#ffffff",
+                    "surface": "#ffffff",
+                    "surface-dim": "#f8fafc",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f8fafc",
+                    "surface-container": "#f1f5f9",
+                    "surface-container-high": "#e2e8f0",
+                    "surface-container-highest": "#cbd5e1",
+                    "on-surface": "#0f172a",
+                    "on-surface-variant": "#475569",
+                    "outline": "#94a3b8",
+                    "outline-variant": "#e2e8f0",
+                    "error": "#dc2626",
+                    "error-container": "#fee2e2",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#7f1d1d",
+                    "background": "#f8fafc",
+                    "secondary": "#64748b",
+                    "secondary-container": "#e2e8f0",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#0f172a",
+                    "tertiary": "#334155",
+                    "tertiary-container": "#cbd5e1",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#0f172a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "gutter": "16px",
+                    "panel-padding": "20px",
+                    "margin-desktop": "32px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "mono-data": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-base": ["Inter"],
+                    "mono-label": ["JetBrains Mono"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "mono-data": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "mono-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom Tactical Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.surface-container'); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant'); 
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.primary'); 
+        }
+        
+        .pulse-led {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.1); box-shadow: 0 0 8px currentColor; }
+        }
+        
+        .grid-bg {
+            background-size: 24px 24px;
+            background-image: 
+                linear-gradient(to right, theme('colors.outline-variant') 1px, transparent 1px),
+                linear-gradient(to bottom, theme('colors.outline-variant') 1px, transparent 1px);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-base h-screen w-screen overflow-hidden flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-margin-desktop h-16 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<!-- Brand Logo Space (Simulated SOTERIA Logo) -->
+<div class="w-8 h-8 bg-primary rounded-sm flex items-center justify-center text-on-primary font-bold shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<h1 class="text-headline-md font-headline-md font-black tracking-tighter text-on-surface uppercase">SOTERIA</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-mono-label font-mono-label text-primary-fixed-dim bg-primary/10 px-3 py-1 rounded border border-primary/20">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim pulse-led"></span>
+                ENGINE ACTIVE
+            </div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-primary transition-colors duration-200 flex items-center justify-center">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="hover:text-primary transition-colors duration-200 flex items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<div class="flex-1 flex pt-16 w-full h-full">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col pt-16 z-40 bg-surface-container-low w-64 border-r border-outline-variant">
+<!-- Header section of nav -->
+<div class="p-6 border-b border-outline-variant flex flex-col gap-1">
+<div class="text-primary font-bold uppercase tracking-widest text-mono-label font-mono-label">STRATEGIC OPS</div>
+<div class="text-on-surface-variant text-mono-data font-mono-data">Global Response</div>
+</div>
+<!-- Main Tabs -->
+<div class="flex flex-col py-4 flex-1">
+<!-- Active Tab -->
+<button class="bg-primary/10 text-primary border-l-4 border-primary px-4 py-3 flex items-center gap-3 w-full text-left transition-all duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="text-mono-label font-mono-label uppercase tracking-wider font-bold">Command HQ</span>
+</button>
+<!-- Inactive Tabs -->
+<button class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface px-4 py-3 border-l-4 border-transparent flex items-center gap-3 w-full text-left transition-all duration-150">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-mono-label font-mono-label uppercase tracking-wider font-bold">Citizen Portal</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface px-4 py-3 border-l-4 border-transparent flex items-center gap-3 w-full text-left transition-all duration-150">
+<span class="material-symbols-outlined">volunteer_activism</span>
+<span class="text-mono-label font-mono-label uppercase tracking-wider font-bold">Volunteer Hub</span>
+</button>
+</div>
+<!-- Footer Tabs -->
+<div class="border-t border-outline-variant p-4 flex flex-col gap-2">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-3 py-2 flex items-center gap-3 rounded transition-all text-xs font-mono-label uppercase">
+<span class="material-symbols-outlined text-[16px]">sync</span> WebSocket
+                </button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-3 py-2 flex items-center gap-3 rounded transition-all text-xs font-mono-label uppercase">
+<span class="material-symbols-outlined text-[16px]">map</span> PostGIS
+                </button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-3 py-2 flex items-center gap-3 rounded transition-all text-xs font-mono-label uppercase">
+<span class="material-symbols-outlined text-[16px]">api</span> Swagger
+                </button>
+</div>
+</nav>
+<!-- Center Pane: Map & Tactics (Fluid) -->
+<main class="flex-1 ml-64 relative bg-surface-container overflow-hidden flex flex-col">
+<!-- Simulated 3D Deck.gl Map Canvas -->
+<div class="absolute inset-0 z-0 bg-surface-dim">
+<div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+<!-- Tactical Map Image Placeholder -->
+<div class="w-full h-full bg-cover bg-center opacity-30 mix-blend-multiply grayscale" data-alt="A highly detailed, dark-themed 3D topographical map view displaying urban infrastructure. The map is overlaid with glowing cyan data nodes, structural heatmaps in red and orange, and thin white vector grid lines. The lighting is low and cinematic, resembling a high-tech military command center interface. Focus on geometric density and digital precision." data-location="Global Disaster Zones" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDiDKoUUYzIwFylTk1bzMK1YknRYYH7Dbtd-mh3_HbG28rjRIkgxam92bpQdpTovmNrc8Y9mkym1iWXyl91-E5ajkcoQqvi9rOrwCyBi-CGBs8r5-eRpoLDUdqYxpqg2nFiXJoiZANOLNDZyF_x9oJoY-pStsW9n_s9MwpbeTxF-2ugNVnZX-pluy4mZ0kfUpTgam61B09NjVtJP81ZVrqDNB0jnn_U2_jOwRfCgIZCHL-crdHRChbA4Q')"></div>
+</div>
+<!-- Floating Map Controls (Top Right) -->
+<div class="absolute top-4 right-4 z-10 flex flex-col gap-2 bg-surface/90 backdrop-blur-md border border-outline-variant p-2 rounded shadow-sm">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container rounded transition-colors" title="Zoom In">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container rounded transition-colors" title="Zoom Out">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="w-full h-[1px] bg-outline-variant my-1"></div>
+<button class="w-8 h-8 flex items-center justify-center text-primary bg-primary/10 rounded transition-colors" title="Layers">
+<span class="material-symbols-outlined">layers</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container rounded transition-colors" title="Recenter">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+</div>
+<!-- Floating Tool Overlay (Top Left) -->
+<div class="absolute top-4 left-4 z-10 flex gap-2">
+<div class="bg-surface/90 backdrop-blur border border-outline-variant px-4 py-2 rounded flex items-center gap-3 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">radar</span>
+<span class="font-mono-data text-mono-data text-on-surface uppercase tracking-wider font-bold">Live Telemetry</span>
+</div>
+</div>
+<!-- Bottom Pulsing Alert Ticker -->
+<div class="absolute bottom-6 left-6 right-6 z-20 flex items-center">
+<div class="flex-1 bg-error-container/95 backdrop-blur-md border border-error/50 p-3 flex items-center gap-4 rounded shadow-lg">
+<span class="material-symbols-outlined text-on-error-container animate-pulse">warning</span>
+<div class="flex flex-col overflow-hidden">
+<span class="font-mono-label text-mono-label text-on-error-container font-bold uppercase">Critical Alert Broadcast</span>
+<marquee class="font-mono-data text-mono-data text-error uppercase tracking-wider w-full overflow-hidden whitespace-nowrap font-bold">
+                            [SYS-001] SEISMIC EVENT DETECTED IN SECTOR 4... DEPLOYING DRONE SWARM TO COORDINATES 34.0522° N, 118.2437° W... CASUALTY ESTIMATES UPDATING... [SYS-002] POWER GRID FAILURE IN ADJACENT ZONES... 
+                        </marquee>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Pane: Metrics & Triage (Fixed Width) -->
+<aside class="w-[420px] bg-surface flex flex-col border-l border-outline-variant h-full z-10">
+<!-- Quick Stats Header -->
+<div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-4">
+<h2 class="text-mono-label font-mono-label text-primary uppercase tracking-widest font-bold">Zone Metrics</h2>
+<div class="grid grid-cols-2 gap-2">
+<div class="border border-outline-variant bg-surface p-3 rounded flex flex-col gap-1 shadow-sm">
+<span class="text-[10px] text-on-surface-variant font-mono-label uppercase font-bold">Active Incidents</span>
+<span class="text-headline-md font-headline-md text-on-surface">1,402</span>
+</div>
+<div class="border border-outline-variant bg-surface p-3 rounded flex flex-col gap-1 shadow-sm">
+<span class="text-[10px] text-on-surface-variant font-mono-label uppercase font-bold">Units Deployed</span>
+<span class="text-headline-md font-headline-md text-primary">450</span>
+</div>
+<div class="border border-error/30 bg-error-container/50 p-3 rounded flex flex-col gap-1 col-span-2 relative overflow-hidden shadow-sm">
+<div class="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-error/10 to-transparent"></div>
+<span class="text-[10px] text-on-error-container font-mono-label uppercase z-10 font-bold">Severity Index</span>
+<span class="text-headline-md font-headline-md text-error z-10 flex items-center gap-2">
+                            8.9 <span class="material-symbols-outlined text-[18px]">trending_up</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Segmented Control -->
+<div class="p-4 bg-surface-container-low border-b border-outline-variant">
+<div class="flex bg-surface-container p-1 rounded border border-outline-variant">
+<button class="flex-1 py-2 text-mono-label font-mono-label uppercase bg-surface text-primary border border-outline-variant rounded-sm shadow-sm transition-all text-center font-bold">
+                        Live Triage
+                    </button>
+<button class="flex-1 py-2 text-mono-label font-mono-label uppercase text-on-surface-variant hover:text-on-surface transition-all text-center font-bold">
+                        Sector Dossier
+                    </button>
+</div>
+</div>
+<!-- Live Triage Queue Container -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-surface-dim pb-20">
+<!-- P1 Card (Critical) -->
+<div class="border border-error/50 relative bg-surface rounded p-4 flex flex-col gap-3 shadow-sm">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error rounded-l"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-2 items-center">
+<span class="bg-error text-on-error px-2 py-0.5 text-[10px] font-mono-label font-bold uppercase rounded-sm animate-pulse">P1 Critical</span>
+<span class="text-mono-label font-mono-label text-on-surface-variant font-bold">#TRG-892</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-xs">00:02:14</span>
+</div>
+<div>
+<h3 class="text-body-base font-body-base font-bold text-on-surface">Structural Collapse - Sector 4A</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Multiple civilians reported trapped. High risk of secondary failure. Gas line rupture detected nearby.</p>
+</div>
+<div class="flex justify-between items-center mt-2 border-t border-outline-variant pt-3">
+<div class="flex gap-2">
+<button class="bg-error hover:bg-error/90 text-on-error px-3 py-1.5 text-xs font-mono-label uppercase rounded transition-colors flex items-center gap-1 font-bold shadow-sm">
+<span class="material-symbols-outlined text-[16px]">rocket_launch</span> Dispatch
+                            </button>
+</div>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-surface border border-outline-variant flex items-center justify-center text-[10px] font-mono-data font-bold text-on-surface">M1</div>
+<div class="w-6 h-6 rounded-full bg-surface border border-outline-variant flex items-center justify-center text-[10px] font-mono-data font-bold text-on-surface">E3</div>
+</div>
+</div>
+</div>
+<!-- P2 Card (Urgent) -->
+<div class="border border-outline-variant relative bg-surface rounded p-4 flex flex-col gap-3 shadow-sm">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-2 items-center">
+<span class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-[10px] font-mono-label font-bold uppercase rounded-sm">P2 Urgent</span>
+<span class="text-mono-label font-mono-label text-on-surface-variant font-bold">#TRG-891</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-xs">00:15:30</span>
+</div>
+<div>
+<h3 class="text-body-base font-body-base font-bold text-on-surface">Medical Evac - Zone B</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Requires airlift. 4 casualties stabilized but need immediate transport to Level 1 Trauma.</p>
+</div>
+<div class="flex justify-end mt-2 border-t border-outline-variant pt-3">
+<button class="text-primary hover:bg-primary/5 border border-primary/30 px-3 py-1.5 text-xs font-mono-label uppercase rounded transition-colors font-bold">
+                            Review Protocol
+                        </button>
+</div>
+</div>
+<!-- P3 Card (Routine) -->
+<div class="border border-outline-variant relative bg-surface rounded p-4 flex flex-col gap-3 shadow-sm">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary rounded-l"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-2 items-center">
+<span class="bg-secondary/10 text-secondary border border-secondary/20 px-2 py-0.5 text-[10px] font-mono-label font-bold uppercase rounded-sm">P3 Routine</span>
+<span class="text-mono-label font-mono-label text-on-surface-variant font-bold">#TRG-888</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-xs">01:45:00</span>
+</div>
+<div>
+<h3 class="text-body-base font-body-base font-bold text-on-surface">Supply Route Clearing</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Debris removal required on Main Artery N-7 to ensure supply chain flow.</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

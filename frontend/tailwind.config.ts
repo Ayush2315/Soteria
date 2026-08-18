@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,13 +10,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#090D16",
-        surface: {
-          50: "#1E293B",
-          100: "#172033",
-          200: "#0F172A",
-          300: "#0B1120",
+        background: "#071220",
+        "on-background": "#f1f5f9",
+        surface: "#0b1c30",
+        "on-surface": "#f1f5f9",
+        "surface-container": "#102034",
+        "surface-container-low": "#081628",
+        "surface-container-high": "#192d48",
+        "surface-container-lowest": "#040c17",
+        "surface-variant": "#1e3553",
+        "on-surface-variant": "#94a3b8",
+        "outline-variant": "#223854",
+        outline: "#475569",
+        primary: {
+          DEFAULT: "#ea580c",
+          container: "#c2410c",
+          dim: "#fdba74",
         },
+        "on-primary": "#ffffff",
+        error: {
+          DEFAULT: "#dc2626",
+          container: "#991b1b",
+        },
+        "on-error": "#ffffff",
         triage: {
           critical: "#EF4444", // P1: 80 - 100
           urgent: "#F97316",   // P2: 60 - 79
@@ -26,7 +43,7 @@ const config: Config = {
           primary: "#3B82F6",
           accent: "#6366F1",
           cyan: "#06B6D4",
-        }
+        },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

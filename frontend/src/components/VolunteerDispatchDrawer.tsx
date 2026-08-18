@@ -22,6 +22,9 @@ import {
   Radio,
   Send,
   Sparkles,
+  Users,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 
 interface VolunteerDispatchDrawerProps {
@@ -39,7 +42,7 @@ export function VolunteerDispatchDrawer({
 }: VolunteerDispatchDrawerProps) {
   const [nearbyVolunteers, setNearbyVolunteers] = useState<VolunteerWithDistance[]>([]);
   const [loadingVolunteers, setLoadingVolunteers] = useState(false);
-  const [selectedVolunteerId, setSelectedVolunteerId] = useState<number | null>(null);
+  const [selectedVolunteerIds, setSelectedVolunteerIds] = useState<number[]>([]);
   const [commanderNotes, setCommanderNotes] = useState("");
   const [isDispatching, setIsDispatching] = useState(false);
   const [dispatchError, setDispatchError] = useState<string | null>(null);
@@ -51,11 +54,17 @@ export function VolunteerDispatchDrawer({
       setDispatchError(null);
       setDispatchSuccess(false);
 
-      fetchNearbyVolunteers(incident.id, 15000, 5)
+      fetchNearbyVolunteers(incident.id, 15000, 10)
         .then((vols) => {
           setNearbyVolunteers(vols);
-          if (vols.length > 0) {
-            setSelectedVolunteerId(vols[0].id);
+          // By default, pre-select the nearest available responder(s)
+          const avail = vols.filter((v) => v.status === "AVAILABLE");
+          if (avail.length > 0) {
+            setSelectedVolunteerIds([avail[0].id]);
+          } else if (vols.length > 0) {
+            setSelectedVolunteerIds([vols[0].id]);
+          } else {
+            setSelectedVolunteerIds([]);
           }
         })
         .catch((err) => {
@@ -68,9 +77,26 @@ export function VolunteerDispatchDrawer({
 
   if (!isOpen || !incident) return null;
 
+  const toggleVolunteer = (id: number) => {
+    setSelectedVolunteerIds((prev) =>
+      prev.includes(id) ? prev.filter((vId) => vId !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllAvailable = () => {
+    const availIds = nearbyVolunteers
+      .filter((v) => v.status === "AVAILABLE")
+      .map((v) => v.id);
+    setSelectedVolunteerIds(availIds.length > 0 ? availIds : nearbyVolunteers.map((v) => v.id));
+  };
+
+  const clearSelection = () => {
+    setSelectedVolunteerIds([]);
+  };
+
   const handleDispatch = async () => {
-    if (!selectedVolunteerId) {
-      setDispatchError("Please select an available volunteer responder.");
+    if (selectedVolunteerIds.length === 0) {
+      setDispatchError("Please select at least one volunteer responder.");
       return;
     }
 
@@ -78,7 +104,11 @@ export function VolunteerDispatchDrawer({
     setDispatchError(null);
 
     try {
-      const response = await assignVolunteer(incident.id, selectedVolunteerId, commanderNotes);
+      const response = await assignVolunteer(
+        incident.id,
+        selectedVolunteerIds,
+        commanderNotes
+      );
       setDispatchSuccess(true);
       setTimeout(() => {
         onDispatchComplete(response);
@@ -86,13 +116,18 @@ export function VolunteerDispatchDrawer({
       }, 1200);
     } catch (err: any) {
       console.error("Dispatch assignment failed:", err);
-      setDispatchError(err?.message || "Failed to dispatch volunteer.");
+      setDispatchError(err?.message || "Failed to dispatch volunteer(s).");
     } finally {
       setIsDispatching(false);
     }
   };
 
-  const selectedVolunteer = nearbyVolunteers.find((v) => v.id === selectedVolunteerId);
+  const selectedVolunteers = nearbyVolunteers.filter((v) =>
+    selectedVolunteerIds.includes(v.id)
+  );
+  const anyBusySelected = selectedVolunteers.some(
+    (v) => v.status === "DISPATCHED" || v.status === "BUSY"
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -109,13 +144,13 @@ export function VolunteerDispatchDrawer({
                 <TriageBadge category={incident.triage_category} />
               </div>
               <p className="text-xs text-slate-400">
-                Incident #{incident.id} — PostGIS Geodesic Matcher & AI SOP Briefing
+                Incident #{incident.id} — PostGIS Multi-Responder Dispatch & AI Safety SOP
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -125,7 +160,7 @@ export function VolunteerDispatchDrawer({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Target Incident Context Card */}
           <div className="glass-panel p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-3">
-            <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center justify-between text-xs flex-wrap gap-2">
               <span className="font-mono text-slate-400 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-red-400" />
                 {incident.location_name || `Coordinates: ${incident.latitude.toFixed(4)}, ${incident.longitude.toFixed(4)}`}
@@ -187,14 +222,33 @@ export function VolunteerDispatchDrawer({
             </div>
           </div>
 
-          {/* PostGIS Nearest Volunteers Selection */}
+          {/* PostGIS Nearest Volunteers Multi-Selection */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-indigo-400" />
-                Nearest Certified Responders (PostGIS Spatial Rank)
-              </h3>
-              <span className="text-[10px] font-mono text-slate-400">Within 15km Search Radius</span>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                  <Navigation className="w-4 h-4 text-indigo-400" />
+                  Nearest Certified Responders (Multi-Select)
+                </h3>
+                <span className="text-[10px] font-mono text-slate-400">Select 1 or multiple responders for team deployment</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={selectAllAvailable}
+                  className="px-2.5 py-1 rounded bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/40 text-[11px] font-mono text-indigo-300 cursor-pointer"
+                >
+                  Select Available
+                </button>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono text-slate-400 cursor-pointer"
+                >
+                  Clear
+                </button>
+              </div>
             </div>
 
             {loadingVolunteers ? (
@@ -210,41 +264,58 @@ export function VolunteerDispatchDrawer({
             ) : (
               <div className="space-y-2">
                 {nearbyVolunteers.map((vol) => {
-                  const isSelected = vol.id === selectedVolunteerId;
+                  const isSelected = selectedVolunteerIds.includes(vol.id);
+                  const isAvailable = vol.status === "AVAILABLE";
+                  const isBusy = vol.status === "DISPATCHED" || vol.status === "BUSY";
+
                   return (
                     <div
                       key={vol.id}
-                      onClick={() => setSelectedVolunteerId(vol.id)}
+                      onClick={() => toggleVolunteer(vol.id)}
                       className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
                         isSelected
-                          ? "bg-indigo-950/60 border-indigo-500 shadow-lg shadow-indigo-500/10"
+                          ? "bg-indigo-950/70 border-indigo-500 shadow-lg shadow-indigo-500/10"
                           : "bg-slate-900/60 border-slate-800 hover:border-slate-700"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2.5">
-                          <div
-                            className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                              isSelected ? "border-indigo-400 bg-indigo-500" : "border-slate-600"
-                            }`}
-                          >
-                            {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          {/* Checkbox Icon */}
+                          <div className="text-indigo-400">
+                            {isSelected ? (
+                              <CheckSquare className="w-5 h-5 text-indigo-400" />
+                            ) : (
+                              <Square className="w-5 h-5 text-slate-600" />
+                            )}
                           </div>
                           <div>
-                            <span className="font-bold text-xs text-white">{vol.name}</span>
-                            <span className="text-[10px] text-slate-400 ml-2 font-mono flex items-center gap-1 inline-flex">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-xs text-white">{vol.name}</span>
+                              {/* Live Availability Status */}
+                              <span
+                                className={`px-2 py-0.2 rounded text-[9px] font-mono font-bold uppercase ${
+                                  isAvailable
+                                    ? "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40"
+                                    : "bg-amber-950/80 text-amber-300 border border-amber-500/40"
+                                }`}
+                              >
+                                {isAvailable ? "🟢 AVAILABLE" : "🟡 ACTIVE ON MISSION"}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
                               <Phone className="w-2.5 h-2.5" />
                               {vol.phone}
                             </span>
                           </div>
                         </div>
+
                         <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">
                           {vol.distance_km} km away
                         </span>
                       </div>
 
                       {/* Skills */}
-                      <div className="flex flex-wrap gap-1 mt-2.5 ml-6">
+                      <div className="flex flex-wrap gap-1 mt-2.5 ml-7">
                         {vol.skills.map((skill, idx) => (
                           <span
                             key={idx}
@@ -261,6 +332,16 @@ export function VolunteerDispatchDrawer({
             )}
           </div>
 
+          {/* Busy Warning Banner if Any Busy Responder is Selected */}
+          {anyBusySelected && (
+            <div className="p-3 bg-amber-950/40 border border-amber-500/40 rounded-xl text-xs text-amber-200 flex items-start gap-2 animate-in fade-in">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <span>
+                <strong>Note:</strong> One or more selected responders are currently engaged on another task. Assigning will redeploy them to this P1 priority mission.
+              </span>
+            </div>
+          )}
+
           {/* Commander Custom Deployment Notes */}
           <div className="space-y-2">
             <label className="text-xs font-mono text-slate-400 uppercase tracking-wide">
@@ -270,7 +351,7 @@ export function VolunteerDispatchDrawer({
               value={commanderNotes}
               onChange={(e) => setCommanderNotes(e.target.value)}
               rows={2}
-              placeholder="e.g., Deploy inflatable boat from upstream Sangam pier. Prioritize infant evacuation."
+              placeholder="e.g., Deploy team via inflatable boat from Sangam North. Coordinate pediatric vest distribution."
               className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 resize-none font-sans"
             />
           </div>
@@ -286,34 +367,34 @@ export function VolunteerDispatchDrawer({
           {dispatchSuccess && (
             <div className="p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-xl text-xs text-emerald-200 flex items-center gap-2 animate-in fade-in">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              Volunteer successfully dispatched! Real-time WebSocket broadcast transmitted.
+              Volunteer team successfully dispatched! Real-time WebSocket broadcast transmitted.
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between gap-4">
+        <div className="p-6 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between gap-4 flex-wrap">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 text-xs text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+            className="px-4 py-2.5 text-xs text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Cancel
           </button>
 
           <button
             onClick={handleDispatch}
-            disabled={isDispatching || !selectedVolunteerId || nearbyVolunteers.length === 0}
+            disabled={isDispatching || selectedVolunteerIds.length === 0}
             className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xl shadow-indigo-600/20 transition-all cursor-pointer"
           >
             {isDispatching ? (
               <>
                 <Radio className="w-4 h-4 animate-spin text-white" />
-                Transmitting Dispatch Order...
+                Transmitting Multi-Responder Dispatch...
               </>
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                Dispatch {selectedVolunteer?.name || "Responder"} with AI SOP
+                Dispatch {selectedVolunteerIds.length} Responder(s) with AI SOP
               </>
             )}
           </button>

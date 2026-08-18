@@ -122,18 +122,25 @@ async def get_nearby_volunteers(
     "/assign",
     response_model=DispatchAssignResponse,
     status_code=status.HTTP_200_OK,
-    summary="Dispatch Volunteer to Incident",
-    description="Assigns a volunteer to an incident, transitions statuses, and broadcasts the event via WebSocket.",
+    summary="Dispatch Volunteer(s) to Incident",
+    description="Assigns one or multiple volunteers to an incident, transitions statuses, and broadcasts the event via WebSocket.",
 )
 async def assign_volunteer(
     payload: DispatchAssignRequest,
     db: AsyncSession = Depends(get_db),
 ) -> DispatchAssignResponse:
     try:
-        incident, volunteer, response = await assign_volunteer_to_incident(
+        vol_ids = payload.volunteer_ids or ([payload.volunteer_id] if payload.volunteer_id else [])
+        if not vol_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="At least one volunteer must be specified for dispatch.",
+            )
+
+        incident, volunteers, response = await assign_volunteer_to_incident(
             db=db,
             incident_id=payload.incident_id,
-            volunteer_id=payload.volunteer_id,
+            volunteer_ids=vol_ids,
             notes=payload.notes,
         )
 

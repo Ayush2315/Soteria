@@ -244,3 +244,90 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 8. Role-Based Authentication (RBAC) & Access Gateway Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 👤 Evaluator / Commander / Volunteer
+    participant App as Next.js 14 Frontend
+    participant AuthContext as React AuthContext (localStorage)
+    participant AuthAPI as FastAPI Auth Router (/api/v1/auth)
+    participant DB as PostgreSQL Users Table
+
+    alt 1-Click Demo Commander Access
+        User->>App: 1. Clicks "Demo Commander" pill in AuthModal
+        App->>AuthAPI: 2. POST /api/v1/auth/login { email: "commander@soteria.gov", password: "..." }
+        AuthAPI->>DB: 3. Fetch user record and verify bcrypt hash
+        AuthAPI-->>App: 4. Returns JWT Token (sub: email, role: "HQ_COMMANDER", exp: 24h)
+        App->>AuthContext: 5. Store soteria_access_token & soteria_user_profile
+        AuthContext-->>App: 6. Top Header updates to "Chief Commander Rajiv Malhotra [HQ_COMMANDER]"
+        App-->>User: 7. Unlocks 3D Tactical GIS Map & 1-Click Dispatch Actions
+    else Unauthenticated Volunteer Access Guard
+        User->>App: 8. Clicks "Volunteer Hub" tab while in Guest mode
+        App->>AuthContext: 9. Check isAuthenticated && (role === 'VOLUNTEER' || role === 'HQ_COMMANDER')
+        Note over App,User: Access Denied (Guest) -> Prompts AuthModal with "VOLUNTEER" target role
+        User->>App: 10. Clicks "Demo Volunteer"
+        App->>AuthAPI: 11. POST /api/v1/auth/login { email: "aarav.volunteer@soteria.org", password: "..." }
+        AuthAPI-->>App: 12. Returns JWT Token (role: "VOLUNTEER")
+        App->>AuthContext: 13. Update auth state
+        App-->>User: 14. Unlocks Mission SOPs and AI Closed-Loop Photo Verification
+    else Friction-Free Citizen SOS (Zero Auth Barrier)
+        User->>App: 15. Clicks "New SOS" / Records Distress Note
+        Note over App: Zero auth check — instant public SOS intake enabled!
+        App-->>User: 16. Submits distress payload immediately
+    end
+```
+
+---
+
+## 9. Crowdsourced Relief Spot Nomination & Multi-Volunteer Proximity Dispatch Lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Citizen as 📱 Citizen (Hyperlocal Scout)
+    actor Volunteer as 🦺 Volunteer Responder (Field Recon)
+    actor Commander as 🖥️ HQ Commander (Tactical Lead)
+    participant App as Next.js 14 Frontend
+    participant API as FastAPI Relief & Dispatch Endpoints
+    participant PostGIS as PostgreSQL 16 + PostGIS Spatial Engine
+    participant WS as WebSocket Stream (/ws/incidents)
+
+    %% 1. Nomination
+    Citizen->>App: 1. Submits Drop Spot ("St. Peter Church Terrace", FLAT_ROOFTOP, Dry High Ground)
+    App->>API: 2. POST /api/v1/relief/nominate
+    API->>PostGIS: 3. Store NominatedSpot (Status: PENDING_RECON) & auto-create VolunteerTask (#TASK-803)
+    API-->>App: 4. Returns Spot ID #SPOT-103 receipt card to Citizen
+
+    %% 2. Recon Verification & Quota Balancing
+    Volunteer->>App: 5. Views Volunteer Hub Task Queue & clicks "[ ✋ Volunteer for Mission (+1) ]"
+    App->>API: 6. POST /api/v1/relief/tasks/TASK-803/volunteer { action: "join" }
+    API-->>App: 7. Atomic quota update (1/2 Responders Assigned)
+    Volunteer->>App: 8. Conducts on-site inspection & clicks "Approve Spot" (Clear for airdrop)
+    App->>API: 9. POST /api/v1/relief/verify-spot { spot_id: "SPOT-103", is_approved: true }
+    API->>PostGIS: 10. Update Spot Status -> "APPROVED_ACTIVE" & Task -> "APPROVED_SAFE"
+    API-->>WS: 11. Broadcast Spot Approval Event to Command HQ
+
+    %% 3. Supply Dispatch
+    Commander->>App: 12. Opens "Approved Relief Spots" Modal in Command HQ
+    App->>API: 13. GET /api/v1/relief/nominated-spots?status=APPROVED_ACTIVE
+    API-->>App: 14. Returns verified drop spots list
+    Commander->>App: 15. Selects 48H Rations, Potable Water, Trauma Kits & Helicopter Airdrop
+    App->>API: 16. POST /api/v1/relief/dispatch-supply
+    API-->>App: 17. Returns tracking convoy receipt (e.g. AIRDROP-SPOT-103-8842)
+    API-->>WS: 18. Broadcasts Supply Convoy Active status to GIS map
+
+    %% 4. Multi-Volunteer Proximity Team Dispatch
+    Commander->>App: 19. Opens Proximity Dispatch Drawer for P1 incident #55
+    App->>API: 20. GET /api/v1/dispatch/nearby?incident_id=55 (Returns all nearby responders)
+    Commander->>App: 21. Multi-selects Capt. Rajesh Verma (Boat Lead) + Pooja Deshmukh (Paramedic)
+    App->>API: 22. POST /api/v1/dispatch/assign { volunteer_ids: [1, 2], notes: "Deploy boat from Sangam North" }
+    API->>PostGIS: 23. Batch update volunteer statuses to DISPATCHED
+    API-->>WS: 24. Real-time broadcast: 2 responders deployed to Incident #55
+```
+
+
+

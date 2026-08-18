@@ -13,11 +13,41 @@ from geoalchemy2.elements import WKTElement
 from sqlalchemy import select, delete
 
 from app.core.database import AsyncSessionLocal, init_db
+from app.core.security import get_password_hash
 from app.models.incident import Incident, SourceType, TriageCategory, IncidentStatus
 from app.models.volunteer import Volunteer, VolunteerStatus
+from app.models.user import User, UserRole
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("soteria.seed")
+
+# Default RBAC User Accounts
+SEED_USERS = [
+    {
+        "email": "commander@soteria.gov",
+        "password": "Command@2026",
+        "full_name": "Chief Commander Rajiv Malhotra",
+        "role": UserRole.HQ_COMMANDER,
+        "phone": "+91-9811002233",
+        "certifications": ["INCIDENT_COMMANDER", "CRISIS_MANAGEMENT_LEVEL_4", "GIS_TACTICAL_DIRECTOR"],
+    },
+    {
+        "email": "aarav.volunteer@soteria.org",
+        "password": "Rescue@2026",
+        "full_name": "Capt. Aarav Sharma (Field Lead)",
+        "role": UserRole.VOLUNTEER,
+        "phone": "+91-9876543210",
+        "certifications": ["BOAT_OPERATOR", "SWIMMER", "WATER_RESCUE", "NIGHT_OPS"],
+    },
+    {
+        "email": "citizen@soteria.org",
+        "password": "Citizen@2026",
+        "full_name": "Priya Sen (Citizen)",
+        "role": UserRole.CITIZEN,
+        "phone": "+91-9988776655",
+        "certifications": [],
+    },
+]
 
 # 8 Registered Field Volunteers situated across Prayagraj sectors
 VOLUNTEERS_DATA = [
@@ -318,7 +348,24 @@ async def seed():
         logger.info("Purging previous seed test records...")
         await session.execute(delete(Incident))
         await session.execute(delete(Volunteer))
+        await session.execute(delete(User))
         await session.commit()
+
+        logger.info(f"Seeding {len(SEED_USERS)} default RBAC user accounts...")
+        for u in SEED_USERS:
+            user = User(
+                email=u["email"],
+                hashed_password=get_password_hash(u["password"]),
+                full_name=u["full_name"],
+                role=u["role"],
+                phone=u["phone"],
+                is_active=True,
+                certifications=u["certifications"],
+            )
+            session.add(user)
+
+        await session.commit()
+        logger.info(f"Successfully seeded {len(SEED_USERS)} user accounts.")
 
         logger.info(f"Seeding {len(VOLUNTEERS_DATA)} certified Prayagraj field volunteers...")
         created_volunteers = []

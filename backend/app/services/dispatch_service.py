@@ -44,12 +44,12 @@ async def find_nearest_volunteers(
     latitude: float,
     longitude: float,
     radius_meters: float = 15000.0,
-    limit: int = 5,
-    status_filter: Optional[VolunteerStatus] = VolunteerStatus.AVAILABLE,
+    limit: int = 10,
+    status_filter: Optional[VolunteerStatus] = None,
 ) -> List[VolunteerWithDistance]:
     """
     Queries nearest field volunteers to the given target coordinate using PostGIS spatial indexing.
-    Returns volunteers sorted by ascending proximity distance in meters.
+    Returns ALL volunteers in range (with their real-time AVAILABLE vs DISPATCHED status).
     """
     logger.info(f"Querying nearest volunteers around ({latitude:.4f}, {longitude:.4f}) within {radius_meters}m")
 
@@ -99,15 +99,18 @@ async def find_nearest_volunteers(
 async def assign_volunteer_to_incident(
     db: AsyncSession,
     incident_id: int,
-    volunteer_id: int,
+    volunteer_ids: List[int],
     notes: Optional[str] = None,
-) -> Tuple[Incident, Volunteer, DispatchAssignResponse]:
+) -> Tuple[Incident, List[Volunteer], DispatchAssignResponse]:
     """
-    Assigns a volunteer to a disaster incident:
-    1. Updates Incident status to DISPATCHED and links assigned_volunteer_id.
-    2. Updates Volunteer status to DISPATCHED.
+    Assigns one or multiple volunteers to a disaster incident:
+    1. Updates Incident status to DISPATCHED and links primary assigned_volunteer_id.
+    2. Updates each Volunteer status to DISPATCHED.
     3. Returns updated models and dispatch briefing.
     """
+    if not volunteer_ids:
+        raise ValueError("At least one volunteer ID must be specified for dispatch.")
+
     # Fetch incident
     inc_stmt = select(Incident).where(Incident.id == incident_id)
     inc_res = await db.execute(inc_stmt)
@@ -116,35 +119,48 @@ async def assign_volunteer_to_incident(
     if not incident:
         raise ValueError(f"Incident with ID {incident_id} not found.")
 
-    # Fetch volunteer
-    vol_stmt = select(Volunteer).where(Volunteer.id == volunteer_id)
+    # Fetch volunteers
+    vol_stmt = select(Volunteer).where(Volunteer.id.in_(volunteer_ids))
     vol_res = await db.execute(vol_stmt)
-    volunteer = vol_res.scalar_one_or_none()
+    volunteers = vol_res.scalars().all()
 
-    if not volunteer:
-        raise ValueError(f"Volunteer with ID {volunteer_id} not found.")
+    if not volunteers:
+        raise ValueError(f"No valid volunteers found for IDs {volunteer_ids}.")
 
     # Update states
-    incident.assigned_volunteer_id = volunteer.id
+    primary_vol = volunteers[0]
+    incident.assigned_volunteer_id = primary_vol.id
     incident.status = IncidentStatus.DISPATCHED
     incident.updated_at = datetime.utcnow()
 
-    volunteer.status = VolunteerStatus.DISPATCHED
-    volunteer.last_ping = datetime.utcnow()
+    # Store assigned volunteer list in metadata
+    entities = incident.extracted_entities or {}
+    entities["assigned_volunteer_ids"] = [v.id for v in volunteers]
+    entities["assigned_volunteer_names"] = [v.name for v in volunteers]
+    entities["commander_dispatch_notes"] = notes
+    incident.extracted_entities = entities
+
+    for vol in volunteers:
+        vol.status = VolunteerStatus.DISPATCHED
+        vol.last_ping = datetime.utcnow()
 
     await db.commit()
     await db.refresh(incident)
-    await db.refresh(volunteer)
+    for vol in volunteers:
+        await db.refresh(vol)
 
     sop_data = incident.safety_sop or {}
+    vol_reads = [VolunteerRead.model_validate(v) for v in volunteers]
 
+    names_str = ", ".join(v.name for v in volunteers)
     response = DispatchAssignResponse(
         incident_id=incident.id,
-        volunteer=VolunteerRead.model_validate(volunteer),
+        volunteer=vol_reads[0],
+        volunteers=vol_reads,
         incident_status=incident.status.value,
         safety_sop=sop_data,
         assigned_at=datetime.utcnow(),
-        message=f"Volunteer {volunteer.name} successfully dispatched to incident #{incident.id}.",
+        message=f"{len(volunteers)} Responder(s) ({names_str}) successfully dispatched to incident #{incident.id}.",
     )
 
-    return incident, volunteer, response
+    return incident, list(volunteers), response

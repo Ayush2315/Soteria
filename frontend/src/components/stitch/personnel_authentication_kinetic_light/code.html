@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinetic Response - Secure Login</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container-high": "#dce9ff",
+                "inverse-primary": "#ffb59e",
+                "tertiary": "#515c71",
+                "primary-container": "#d34000",
+                "tertiary-container": "#6a758a",
+                "on-primary-fixed-variant": "#842500",
+                "on-error-container": "#93000a",
+                "outline": "#916f65",
+                "on-tertiary-fixed-variant": "#3c475a",
+                "secondary-fixed-dim": "#e9c400",
+                "inverse-on-surface": "#eaf1ff",
+                "on-secondary-container": "#6e5c00",
+                "on-surface-variant": "#5c4037",
+                "tertiary-fixed": "#d8e3fb",
+                "outline-variant": "#e6beb2",
+                "secondary-fixed": "#ffe16d",
+                "surface-container-highest": "#d3e4fe",
+                "surface-container": "#e5eeff",
+                "on-tertiary": "#ffffff",
+                "primary-fixed-dim": "#ffb59e",
+                "surface-dim": "#cbdbf5",
+                "inverse-surface": "#213145",
+                "surface-bright": "#f8f9ff",
+                "secondary": "#705d00",
+                "secondary-container": "#fcd400",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#111c2d",
+                "primary": "#a93100",
+                "error": "#ba1a1a",
+                "surface": "#f8f9ff",
+                "on-tertiary-container": "#fefcff",
+                "tertiary-fixed-dim": "#bcc7de",
+                "primary-fixed": "#ffdbd0",
+                "surface-container-low": "#eff4ff",
+                "surface-container-lowest": "#ffffff",
+                "error-container": "#ffdad6",
+                "on-secondary-fixed-variant": "#544600",
+                "background": "#f8f9ff",
+                "on-secondary-fixed": "#221b00",
+                "on-primary-fixed": "#3a0b00",
+                "surface-tint": "#ad3300",
+                "on-primary-container": "#fffbff",
+                "on-background": "#0b1c30",
+                "on-surface": "#0b1c30",
+                "on-error": "#ffffff",
+                "surface-variant": "#d3e4fe",
+                "on-secondary": "#ffffff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "lg": "40px",
+                "base": "8px",
+                "sm": "12px",
+                "xl": "64px",
+                "xs": "4px",
+                "margin-mobile": "16px",
+                "margin-desktop": "32px",
+                "gutter": "16px",
+                "md": "24px"
+        },
+        "fontFamily": {
+                "display-lg": [
+                        "Inter"
+                ],
+                "code-data": [
+                        "JetBrains Mono"
+                ],
+                "body-lg-bold": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "label-sm": [
+                        "JetBrains Mono"
+                ],
+                "headline-lg-mobile": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "code-data": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg-bold": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Hard shadow utility for active/hover states per brand guidelines */
+        .hover-hard-shadow:hover {
+            box-shadow: 4px 4px 0px 0px theme('colors.primary');
+            transform: translate(-2px, -2px);
+        }
+        .hover-hard-shadow {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen w-full overflow-hidden flex flex-col antialiased">
+<!-- TopAppBar: Suppressed Navigation Links for Linear/Transactional Login Page, Removed border per mandate -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface/90 backdrop-blur-md drop-shadow-sm">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg font-bold text-primary tracking-tight">Kinetic Response</span>
+</div>
+<div class="flex items-center gap-sm">
+<button aria-label="Toggle Theme" class="text-primary hover:bg-surface-container-high transition-colors p-2 rounded-full flex items-center justify-center group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">light_mode</span>
+</button>
+<button aria-label="Notifications" class="text-primary hover:bg-surface-container-high transition-colors p-2 rounded-full flex items-center justify-center group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">notifications</span>
+</button>
+</div>
+</header>
+<!-- Asymmetric Split Layout -->
+<main class="flex-1 flex w-full h-full pt-16">
+<!-- Left Side: Ambient Security Visuals (Hidden on Mobile) -->
+<div class="hidden md:flex relative w-1/2 h-full bg-surface-container-highest overflow-hidden items-end p-xl">
+<!-- Background Image -->
+<img class="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40" data-alt="A highly detailed, cinematic photograph of a high-tech secure server operations center. The room features glowing arrays of data racks illuminated by cold blue and crisp white LED lights, reflecting a modern, light-mode functional minimalist aesthetic. The environment is orderly and imposing, projecting an atmosphere of urgent calm, deep security, and institutional authority. Deep shadows contrast with bright status indicators." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD0NSxZtCf5RjiYmbUBkAKl2ACF0tlbZAyEN-oFtmefk_M3ExzBMRc7eSCaeNqplZV6GTqf51zaoFCLwxlGM16A12NRa7l-eRAdYSCMF8vzLSVwId5cSaZv8ijiU4k8Cjqixb_suZnLabscFckrgS0uxLB438jCwTfqJrCVTHJJbmGaOs_t5dXNh7V-mdialnJW-hV5dl06LnJBlbKqcGdNtg1JBDMQ5rajotFx0n858qV3TSQ2BOsww"/>
+<!-- Graphic Overlay Pattern -->
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_theme('colors.surface-container-highest')_100%)] opacity-80"></div>
+<!-- System Status Chips -->
+<div class="relative z-10 flex flex-col gap-sm w-full max-w-sm">
+<div class="flex items-center gap-sm bg-surface/90 backdrop-blur-sm border border-outline-variant rounded p-sm shadow-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Network Status</span>
+<span class="font-code-data text-code-data text-on-surface font-semibold">SECURE CONNECTION ESTABLISHED</span>
+</div>
+</div>
+<div class="flex items-center gap-sm bg-surface/90 backdrop-blur-sm border border-outline-variant rounded p-sm shadow-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Encryption</span>
+<span class="font-code-data text-code-data text-on-surface font-semibold">AES-256 ACTIVE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Login Form Canvas -->
+<div class="w-full md:w-1/2 h-full flex items-center justify-center p-gutter md:p-xl bg-surface relative overflow-y-auto">
+<!-- Decorative background elements for high-end UI feel -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-surface-container rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+<div class="w-full max-w-md flex flex-col relative z-10">
+<!-- Role Badge Header -->
+<div class="flex items-center mb-lg">
+<div class="bg-surface-variant border border-outline-variant px-sm py-xs rounded flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface text-[16px]">admin_panel_settings</span>
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-widest">Volunteer &amp; HQ Authorization</span>
+</div>
+</div>
+<!-- Titles -->
+<div class="mb-xl">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-xs tracking-tight">Authorized Personnel Only</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Please authenticate your identity to access the Kinetic Response network.</p>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-md" onsubmit="event.preventDefault();">
+<!-- Input: Email/ID -->
+<div class="flex flex-col gap-xs group">
+<label class="font-label-sm text-label-sm text-on-surface flex justify-between items-end" for="userId">
+<span>IDENTIFICATION / EMAIL</span>
+</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant group-focus-within:text-primary transition-colors">badge</span>
+<input class="w-full bg-surface-container-lowest text-on-surface font-code-data text-code-data pl-xl pr-sm py-3 border border-outline-variant rounded transition-all outline-none focus:border-primary focus:border-2 focus:ring-0 placeholder:text-on-surface-variant/50" id="userId" placeholder="Enter ID or Email" required="" type="text"/>
+</div>
+</div>
+<!-- Input: Password -->
+<div class="flex flex-col gap-xs group">
+<label class="font-label-sm text-label-sm text-on-surface flex justify-between items-end" for="password">
+<span>PASSPHRASE</span>
+<a class="text-primary hover:underline font-label-sm text-label-sm lowercase" href="#">Forgot?</a>
+</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant group-focus-within:text-primary transition-colors">key</span>
+<input class="w-full bg-surface-container-lowest text-on-surface font-code-data text-code-data pl-xl pr-sm py-3 border border-outline-variant rounded transition-all outline-none focus:border-primary focus:border-2 focus:ring-0 placeholder:text-on-surface-variant/50" id="password" placeholder="••••••••••••" required="" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute right-3 text-on-surface-variant hover:text-on-surface transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Input: MFA -->
+<div class="flex flex-col gap-xs group mt-sm">
+<label class="font-label-sm text-label-sm text-on-surface flex items-center gap-xs" for="mfaCode">
+<span>MULTI-FACTOR AUTHENTICATION</span>
+<span class="material-symbols-outlined text-[16px] text-error" style="font-variation-settings: 'FILL' 1;" title="Required Field">emergency</span>
+</label>
+<p class="font-label-sm text-[10px] text-on-surface-variant mb-xs">Enter the 6-digit pin from your authenticator device.</p>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant group-focus-within:text-primary transition-colors">pin</span>
+<input class="w-full bg-surface-container-lowest text-on-surface font-code-data text-code-data text-center pl-xl pr-sm py-3 border border-outline-variant rounded transition-all outline-none focus:border-primary focus:border-2 focus:ring-0 placeholder:text-on-surface-variant/50 tracking-[0.5em]" id="mfaCode" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="000-000" required="" type="text"/>
+</div>
+</div>
+<!-- Submit Action -->
+<div class="mt-lg pt-base">
+<button class="w-full bg-primary text-on-primary font-body-lg-bold text-body-lg-bold uppercase py-4 px-6 rounded flex items-center justify-center gap-sm hover-hard-shadow active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface" type="submit">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lock_open</span>
+                            AUTHENTICATE
+                        </button>
+</div>
+</form>
+<!-- Footer Links -->
+<div class="mt-xl flex justify-center items-center gap-sm border-t border-outline-variant pt-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Need clearance?</span>
+<a class="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-xs" href="#">
+                        Request Access
+                        <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+</body></html>

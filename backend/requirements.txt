@@ -8,6 +8,7 @@ uvicorn[standard]>=0.28.0,<1.0.0
 # Settings & Validation
 pydantic>=2.6.4,<3.0.0
 pydantic-settings>=2.2.1,<3.0.0
+email-validator>=2.1.0,<3.0.0
 python-dotenv>=1.0.1,<2.0.0
 
 # Database ORM & PostGIS Spatial Drivers
@@ -17,6 +18,11 @@ psycopg2-binary>=2.9.9,<3.0.0
 geoalchemy2>=0.14.4,<1.0.0
 shapely>=2.0.3,<3.0.0
 alembic>=1.13.1,<2.0.0
+
+# Security, JWT & Password Hashing
+python-jose[cryptography]>=3.3.0,<4.0.0
+passlib[bcrypt]>=1.7.4,<2.0.0
+bcrypt>=4.0.1,<5.0.0
 
 # Google Gemini AI SDKs (Multimodal & LLM)
 google-genai>=0.1.1,<1.0.0

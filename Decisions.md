@@ -172,3 +172,83 @@ We implemented a three-tier resilience and dispatch architecture:
 - **Positive:** Zero data loss in dead-zones, instant geodesic volunteer matching, hallucination-resistant photo closure audits, and automated executive operational awareness.
 - **Trade-off:** Client storage is bounded by browser IndexedDB quotas (~50MB-1GB depending on device).
 
+---
+
+## ADR 008: Modern Slack 3-Pane Incident Workspace & Confined 3D Map Architecture
+
+### Context & Problem Statement
+Full-screen geospatial maps overwhelm tactical operators who need simultaneous access to incident feeds, dialect translations, AI Safety SOP checklists, and volunteer dispatch actions without context-switching between disconnected screens.
+
+### Decision
+We structured the disaster operations center into a 3-pane Slack-inspired workspace:
+1. **Left Workspace App Rail & Channel Directory (`#350d36` / `#3F0E40`):** Fast channel switching (`#emergency-triage`, `#critical-p1-alerts`, `#urgent-p2-queue`, `#volunteer-dispatch`) and role navigation.
+2. **Center Confined Workspace Canvas (`#1A1D21`):** Dynamic toggle between 3D WebGL Deck.gl Map, Slack Message Feed with rich APP cards, and Split View.
+3. **Right Contextual Slackbot Thread Drawer (`w-[420px]`):** AI Agent (`🤖 SoteriaBot`) thread detailing dialect translation, casualty count, dynamic safety SOPs, and 1-click volunteer dispatch.
+
+### Consequences
+- **Positive:** Maximum operational efficiency, zero UI lag, and familiar modern collaboration paradigm for first responders.
+- **Trade-off:** Requires responsive layout collapsing on smaller screen viewports.
+
+---
+
+## ADR 009: Production-Grade JWT Role-Based Access Control (RBAC) & Access Gateway
+
+### Context & Problem Statement
+Disaster operations involve three distinct personas with conflicting security and friction requirements:
+1. **Citizens:** In extreme life peril, requiring zero-friction, unauthenticated guest access to submit voice/photo SOS tickets.
+2. **Volunteers:** Requiring authenticated access to view mission protocols, safety SOPs, and upload AI resolution proof photos.
+3. **HQ Commanders:** Requiring authenticated access to trigger spatial dispatches, inspect tactical GIS heatmaps, and generate SitRep summaries.
+
+### Decision
+We implemented a lightweight, production-grade JWT authentication and RBAC layer across backend and frontend:
+1. **Backend Security (`app/core/security.py` & `app/api/v1/endpoints/auth.py`):**
+   - Password hashing with native `bcrypt` and salt rounds.
+   - Cryptographically signed JWT tokens (`HS256`, 24-hour expiration) embedding user `sub`, `role`, and `user_id`.
+   - FastAPI dependency `get_current_user` and role-checker `require_roles([UserRole.HQ_COMMANDER, UserRole.VOLUNTEER])`.
+2. **Frontend Auth State (`src/lib/auth.tsx` & `src/components/AuthModal.tsx`):**
+   - Persistent `localStorage` token and profile storage with automatic session recovery.
+   - `getAuthHeaders()` injecting `Authorization: Bearer <token>` into authenticated API calls.
+   - Glassmorphic `AuthModal` with 1-click **"Fill Demo Commander"** and **"Fill Demo Volunteer"** buttons for evaluator convenience.
+   - Contextual route guarding: Unauthenticated users can submit Citizen SOS freely in guest mode, while Volunteer and Commander tabs trigger the Auth Gateway modal.
+
+### Consequences
+- **Positive:** Zero friction for victims in danger, strict role-based access for operational command, and seamless evaluation with 1-click demo buttons.
+- **Trade-off:** Requires client-side token expiration handling and secure storage in browser.
+
+---
+
+## ADR 010: Multi-Volunteer Proximity Dispatch & Crowdsourced Relief Lifecycle
+
+### Context & Problem Statement
+During severe mass-casualty disasters (e.g. Prayagraj flash floods), individual field assignments often fail due to:
+1. Complex rescues requiring multi-responder teams (e.g., motorboat operator + swimmer + paramedic).
+2. Uncoordinated volunteer congestion leading to dangerous over-deployment in single sectors while adjacent zones remain neglected.
+3. Lack of ground truth verification for citizen-nominated helicopter/boat relief drop spots, risking supply loss in submerged currents or electrical wire entanglements.
+
+### Decision
+We implemented a closed-loop Crowdsourced Relief Lifecycle with PostGIS Multi-Responder Dispatch and dynamic quota balancing:
+1. **Multi-Volunteer Spatial Dispatch (`VolunteerDispatchDrawer.tsx` & `dispatch_service.py`):**
+   - Commanders can select 1 or multiple responders via PostGIS spatial rank.
+   - Responders display live availability indicators (`🟢 AVAILABLE` vs `🟡 ACTIVE ON MISSION`).
+   - Dispatches batch-update volunteer statuses and send real-time WebSocket broadcasts.
+2. **Dynamic Quota Balancing (`StitchVolunteerHub.tsx` & `relief.py`):**
+   - Task capacity meters (e.g., `2 / 4 Responders Needed`) prevent over-deployment.
+   - Volunteers can self-claim open slots with 1-click `[ ✋ Volunteer for Mission (+1) ]` or leave missions, dynamically adjusting capacity bars.
+   - When quota reaches 100%, status automatically shifts to `QUOTA_FULL` and locks intake.
+3. **Citizen Drop Spot Nomination to Ground Recon Audit:**
+   - Citizens nominate high ground (rooftops, levees, overbridges) with terrain types and obstacle notes.
+   - The nomination automatically generates a Recon Task in the Volunteer Hub.
+   - Certified volunteers inspect the site on foot/boat, submit clearance notes, and approve the spot as `APPROVED_ACTIVE` / `APPROVED_SAFE`.
+4. **Command HQ 1-Click Supply Airdrop/Convoy Dispatch:**
+   - Command HQ accesses verified spots in the **"Approved Crowdsourced Supply Drop Spots"** dashboard.
+   - Commanders select supply packages (`48H Rations`, `Potable Water`, `Trauma Kits`, `Power Generators`) and transport mechanisms (`Helicopter Airdrop`, `Rescue Boat Convoy`, `4x4 Amphibious Truck`).
+   - Generates an instant logistical tracking convoy receipt code (`AIRDROP-SPOT-102-...`).
+5. **Safe Corridor & Compass Navigation Guide:**
+   - Citizens viewing Safe Havens receive exact GPS coordinates, elevation, distance to active flood water, and an interactive **Safe Walking Corridor & Compass Guide** modal to navigate without crossing danger zones.
+
+### Consequences
+- **Positive:** Eliminates field over-deployment, empowers hyperlocal citizen intelligence with volunteer safety verification, and provides end-to-end transparency from distress intake to supply delivery.
+- **Trade-off:** Requires connected field responders for real-time quota synchronization.
+
+
+
