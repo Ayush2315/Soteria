@@ -21,6 +21,10 @@ from app.schemas.incident import (
 )
 from app.services.gemini_service import extract_multimodal_distress
 from app.services.triage_engine import calculate_triage_score
+from app.services.deduplication_service import (
+    find_and_merge_duplicate_incident,
+    generate_tracking_code,
+)
 
 logger = logging.getLogger("soteria.api.triage")
 router = APIRouter()
@@ -161,10 +165,45 @@ async def triage_multimodal_distress(
         ],
     }
 
-    # 7. PostGIS Spatial Point (SRID 4326: WGS 84 GPS)
+    # 7. Check for Spatial Duplicate (50m radius, 12-hour window)
+    merged_incident, is_merged = await find_and_merge_duplicate_incident(
+        db=db,
+        latitude=latitude,
+        longitude=longitude,
+        hazard_type=extraction.hazard_type,
+        raw_payload=extraction.transcript or text or "Multimodal distress signal",
+        source_channel=source_type.value,
+        incoming_trapped=extraction.trapped_count,
+        client_timestamp=client_time,
+    )
+
+    if is_merged and merged_incident:
+        incident_read = IncidentRead.model_validate(merged_incident)
+        try:
+            await ws_manager.broadcast_incident(
+                event_type="INCIDENT_MERGED",
+                incident_data=incident_read.model_dump(mode="json"),
+                triage_breakdown={"reporter_count": merged_incident.reporter_count},
+            )
+        except Exception as ws_err:
+            logger.warning(f"WebSocket broadcast non-fatal exception: {ws_err}")
+
+        return MultimodalTriageResponse(
+            incident=incident_read,
+            extraction=extraction,
+            triage_breakdown=triage_breakdown,
+            audio_playback_url=audio_url,
+            image_preview_url=image_url,
+        )
+
+    # 8. PostGIS Spatial Point (SRID 4326: WGS 84 GPS)
     point_wkt = f"SRID=4326;POINT({longitude} {latitude})"
+    tracking_code = generate_tracking_code()
 
     db_incident = Incident(
+        tracking_code=tracking_code,
+        reporter_count=1,
+        duplicate_metadata=[],
         source_type=source_type,
         raw_payload=extraction.transcript or text or "Multimodal distress signal",
         audio_url=audio_url,
@@ -187,13 +226,13 @@ async def triage_multimodal_distress(
     await db.refresh(db_incident)
 
     logger.info(
-        f"Successfully created Incident #{db_incident.id} with Triage Score {triage_breakdown.final_score} "
+        f"Successfully created Incident #{db_incident.id} (tracking: {tracking_code}) with Triage Score {triage_breakdown.final_score} "
         f"[{triage_breakdown.triage_category.value}] at ({latitude}, {longitude})"
     )
 
     incident_read = IncidentRead.model_validate(db_incident)
 
-    # 8. Real-Time WebSocket Broadcast to Commander GIS Dashboards
+    # 9. Real-Time WebSocket Broadcast to Commander GIS Dashboards
     try:
         await ws_manager.broadcast_incident(
             event_type="INCIDENT_CREATED",
@@ -210,3 +249,4 @@ async def triage_multimodal_distress(
         audio_playback_url=audio_url,
         image_preview_url=image_url,
     )
+

@@ -10,44 +10,43 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#071220",
-        "on-background": "#f1f5f9",
-        surface: "#0b1c30",
-        "on-surface": "#f1f5f9",
-        "surface-container": "#102034",
-        "surface-container-low": "#081628",
-        "surface-container-high": "#192d48",
-        "surface-container-lowest": "#040c17",
-        "surface-variant": "#1e3553",
-        "on-surface-variant": "#94a3b8",
-        "outline-variant": "#223854",
-        outline: "#475569",
+        background: "#f8fafc",
+        "on-background": "#0f172a",
+        surface: "#ffffff",
+        "on-surface": "#0f172a",
+        "surface-container": "#ffffff",
+        "surface-container-low": "#f8fafc",
+        "surface-container-high": "#f1f5f9",
+        "surface-container-lowest": "#ffffff",
+        "surface-variant": "#f1f5f9",
+        "on-surface-variant": "#64748b",
+        "outline-variant": "#e2e8f0",
+        outline: "#cbd5e1",
         primary: {
-          DEFAULT: "#ea580c",
-          container: "#c2410c",
-          dim: "#fdba74",
+          DEFAULT: "#0f172a",
+          container: "#f1f5f9",
+          dim: "#475569",
         },
         "on-primary": "#ffffff",
         error: {
-          DEFAULT: "#dc2626",
-          container: "#991b1b",
+          DEFAULT: "#e11d48",
+          container: "#ffe4e6",
         },
         "on-error": "#ffffff",
         triage: {
-          critical: "#EF4444", // P1: 80 - 100
-          urgent: "#F97316",   // P2: 60 - 79
-          moderate: "#EAB308", // P3: 40 - 59
-          low: "#10B981",      // P4: 0 - 39
+          critical: "#e11d48", // Rose 600
+          urgent: "#f59e0b",   // Amber 500
+          moderate: "#0ea5e9", // Sky 500
+          low: "#10b981",      // Emerald 500
         },
         soteria: {
-          primary: "#3B82F6",
-          accent: "#6366F1",
-          cyan: "#06B6D4",
+          primary: "#0f172a",
+          accent: "#2563eb",
+          slate: "#64748b",
         },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "command-grid": "linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",

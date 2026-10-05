@@ -4,57 +4,41 @@
 
 @layer base {
   :root {
-    --color-bg: #071220;
-    --color-on-bg: #f1f5f9;
+    --color-bg: #f8fafc;
+    --color-on-bg: #0f172a;
   }
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #071220;
-  color: #f1f5f9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
   overflow: hidden;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom glowing badge effects */
-.glow-critical {
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+/* Clean Modern Card Styles */
+.clean-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 }
 
-.glow-urgent {
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+.clean-card-hover {
+  transition: all 0.15s ease-in-out;
 }
 
-.glow-safe {
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+.clean-card-hover:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
-.glass-panel {
-  background: rgba(16, 32, 52, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.dark .glass-panel {
-  background: rgba(11, 28, 48, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.glass-panel-hover {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-panel-hover:hover {
-  border-color: rgba(234, 88, 12, 0.4);
-  transform: translateY(-2px);
-}
-
-/* Waveform Audio Animations */
+/* Subtle Waveform Audio Animations */
 @keyframes wave {
   0%, 100% { height: 4px; }
-  50% { height: 24px; }
+  50% { height: 20px; }
 }
 .bar-1 { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.1s; }
 .bar-2 { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.3s; }
@@ -62,10 +46,10 @@ body {
 .bar-4 { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.4s; }
 .bar-5 { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.2s; }
 
-/* Custom Tactical Scrollbar */
+/* Clean Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -73,10 +57,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #223854;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: #94a3b8;
 }

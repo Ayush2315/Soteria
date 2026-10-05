@@ -519,7 +519,7 @@ export function CitizenSOSForm({ onTriageComplete }: CitizenSOSFormProps) {
               type="text"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
-              className="w-full rounded-lg bg-slate-900 border border-slate-800 px-3 py-2 text-xs font-mono text-cyan-300 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-blue-500"
             />
           </div>
 
@@ -540,7 +540,7 @@ export function CitizenSOSForm({ onTriageComplete }: CitizenSOSFormProps) {
               type="text"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
-              className="w-full rounded-lg bg-slate-900 border border-slate-800 px-3 py-2 text-xs font-mono text-cyan-300 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>

@@ -8,11 +8,18 @@ Usage:
 """
 import asyncio
 import logging
+import os
+import sys
 from datetime import datetime, timedelta
-from geoalchemy2.elements import WKTElement
-from sqlalchemy import select, delete
 
-from app.core.database import AsyncSessionLocal, init_db
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
+from geoalchemy2.elements import WKTElement
+from sqlalchemy import select, delete, text
+
+from app.core.database import AsyncSessionLocal, init_db, engine, Base
 from app.core.security import get_password_hash
 from app.models.incident import Incident, SourceType, TriageCategory, IncidentStatus
 from app.models.volunteer import Volunteer, VolunteerStatus
@@ -341,16 +348,14 @@ INCIDENTS_DATA = [
 
 async def seed():
     """Executes database schema initialization and deterministic data seeding."""
-    logger.info("Initializing PostGIS tables if needed...")
-    await init_db()
+    logger.info("Initializing PostGIS tables and recreating schema cleanly...")
+    async with engine.begin() as conn:
+        import app.models  # noqa: F401
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis;"))
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
     async with AsyncSessionLocal() as session:
-        logger.info("Purging previous seed test records...")
-        await session.execute(delete(Incident))
-        await session.execute(delete(Volunteer))
-        await session.execute(delete(User))
-        await session.commit()
-
         logger.info(f"Seeding {len(SEED_USERS)} default RBAC user accounts...")
         for u in SEED_USERS:
             user = User(
@@ -397,6 +402,9 @@ async def seed():
             assigned_id = created_volunteers[idx % len(created_volunteers)].id if inc_data["status"] == IncidentStatus.DISPATCHED else None
 
             inc = Incident(
+                tracking_code=f"SOT-DEMO{idx + 1}",
+                reporter_count=1,
+                duplicate_metadata=[],
                 source_type=inc_data["source_type"],
                 raw_payload=inc_data["raw_payload"],
                 location_name=inc_data["location_name"],

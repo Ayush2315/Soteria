@@ -66,6 +66,9 @@ export interface TriageBreakdown {
 
 export interface Incident {
   id: number;
+  tracking_code?: string;
+  reporter_count?: number;
+  duplicate_metadata?: any[];
   created_at: string;
   updated_at: string;
   source_type: SourceType;

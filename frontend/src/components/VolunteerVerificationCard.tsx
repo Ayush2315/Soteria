@@ -42,7 +42,7 @@ export function VolunteerVerificationCard({
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // CRITICAL: Reset form and audit state whenever target incident ID changes
+  // Reset form and audit state whenever target incident ID changes
   useEffect(() => {
     setAuditResult(null);
     setClosureNotes("");
@@ -97,7 +97,7 @@ export function VolunteerVerificationCard({
         onVerified(response);
       }
     } catch (err: any) {
-      console.error("AI Verification Audit error:", err);
+      console.error("Verification audit error:", err);
       setAuditError(err?.message || "Failed to submit verification audit.");
     } finally {
       setIsAuditing(false);
@@ -108,22 +108,22 @@ export function VolunteerVerificationCard({
   const existingAudit = incident?.verification_data;
 
   return (
-    <div className="glass-panel p-6 rounded-2xl border border-indigo-500/30 shadow-2xl space-y-6">
+    <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-5 text-slate-900">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800 flex-wrap gap-2">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-indigo-500/15 text-indigo-400 rounded-xl border border-indigo-500/30">
-            <ShieldCheck className="w-6 h-6" />
+          <div className="p-2 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-200">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-black text-white flex items-center gap-2">
-              AI Closed-Loop Verification & Photo Proof Audit
-              <span className="text-[10px] font-mono uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              Resolution Verification
+              <span className="text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">
                 Gemini Vision
               </span>
             </h3>
-            <p className="text-xs text-slate-400">
-              Audit post-rescue evidence against initial hazard requirements to safely close ticket.
+            <p className="text-xs text-slate-500">
+              Verify completion evidence to resolve and archive the incident.
             </p>
           </div>
         </div>
@@ -132,53 +132,52 @@ export function VolunteerVerificationCard({
       {incident ? (
         <div className="space-y-4">
           {/* Active Incident Summary */}
-          <div className="p-4 bg-slate-950/70 rounded-xl border border-slate-800 text-xs space-y-2">
-            <div className="flex items-center justify-between text-slate-400 font-mono">
-              <span>Target Mission: #{incident.id} — {incident.location_name || "Disaster Zone"}</span>
-              <span className={`font-bold ${isAlreadyResolved ? "text-emerald-400" : "text-amber-400"}`}>
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
+            <div className="flex items-center justify-between text-slate-600">
+              <span className="font-semibold text-slate-900">Mission #{incident.id} — {incident.location_name || "Disaster Zone"}</span>
+              <span className={`font-semibold ${isAlreadyResolved ? "text-emerald-700" : "text-amber-700"}`}>
                 Status: {incident.status}
               </span>
             </div>
-            <p className="text-slate-300 italic">
+            <p className="text-slate-600 italic">
               Initial Distress: &quot;{incident.raw_payload || "Emergency distress report"}&quot;
             </p>
           </div>
 
           {/* Verification Audit Completed View */}
           {(auditResult || (isAlreadyResolved && !showReAuditForm)) ? (
-            <div className="p-5 bg-emerald-950/30 rounded-xl border border-emerald-500/40 space-y-4 animate-in fade-in">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-3 animate-in fade-in">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  Gemini Vision Closed-Loop Verification PASSED
+                <div className="flex items-center gap-2 text-emerald-900 font-bold text-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Verification Audit Passed
                 </div>
-                <span className="text-xs font-mono bg-emerald-900/60 text-emerald-300 px-2.5 py-1 rounded border border-emerald-600/40">
+                <span className="text-xs font-medium bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
                   Confidence: {Math.round((auditResult?.audit_result.confidence_score || existingAudit?.confidence_score || 0.95) * 100)}%
                 </span>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-200">
-                <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
-                  <span className="font-mono text-slate-400 uppercase text-[10px] block mb-1">Visual Observations:</span>
-                  <p>{auditResult?.audit_result.visual_observations || existingAudit?.visual_observations || "Post-action photo confirms resolution of hazard. Casualties evacuated safely and area secured."}</p>
+              <div className="space-y-2 text-xs text-slate-800">
+                <div className="bg-white p-3 rounded-lg border border-emerald-200">
+                  <span className="text-slate-500 text-[10px] uppercase font-semibold block mb-1">Visual Observations:</span>
+                  <p>{auditResult?.audit_result.visual_observations || existingAudit?.visual_observations || "Post-action photo confirms resolution of hazard. Area secured."}</p>
                 </div>
 
-                <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
-                  <span className="font-mono text-slate-400 uppercase text-[10px] block mb-1">Closure Executive Receipt:</span>
-                  <p className="text-emerald-300 font-semibold">{auditResult?.audit_result.closure_summary || existingAudit?.closure_summary || "Rescue verified complete with all safety criteria fulfilled."}</p>
+                <div className="bg-white p-3 rounded-lg border border-emerald-200">
+                  <span className="text-slate-500 text-[10px] uppercase font-semibold block mb-1">Summary:</span>
+                  <p className="text-emerald-900 font-medium">{auditResult?.audit_result.closure_summary || existingAudit?.closure_summary || "Rescue verified complete with all safety criteria fulfilled."}</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-2 border-t border-emerald-900/40 flex-wrap gap-2">
-                <span>Incident State: RESOLVED</span>
-                <span>Verified: {auditResult ? new Date(auditResult.resolved_at).toLocaleTimeString() : "Verified by Field Recon"}</span>
+              <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-emerald-200 flex-wrap gap-2">
+                <span>Status: Resolved</span>
                 <button
                   type="button"
                   onClick={() => setShowReAuditForm(true)}
-                  className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
+                  className="flex items-center gap-1 text-blue-600 hover:text-blue-700 underline cursor-pointer text-xs"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  Submit Additional Proof / Re-Audit
+                  Re-Audit / Update Proof
                 </button>
               </div>
             </div>
@@ -186,13 +185,13 @@ export function VolunteerVerificationCard({
             /* Verification Input Form */
             <div className="space-y-4">
               {/* Photo Upload Zone */}
-              <div className="space-y-2">
-                <label className="text-xs font-mono text-slate-400 uppercase tracking-wide">
-                  Post-Rescue Photo Evidence (Resolution Proof):
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">
+                  Resolution Photo Proof:
                 </label>
 
                 {photoPreview ? (
-                  <div className="relative rounded-xl overflow-hidden border border-indigo-500/40 max-h-56 bg-slate-950">
+                  <div className="relative rounded-xl overflow-hidden border border-slate-200 max-h-56 bg-slate-100">
                     <img
                       src={photoPreview}
                       alt="Proof"
@@ -200,7 +199,7 @@ export function VolunteerVerificationCard({
                     />
                     <button
                       onClick={removePhoto}
-                      className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-lg cursor-pointer"
+                      className="absolute top-2 right-2 p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-colors shadow cursor-pointer"
                       title="Remove Photo"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -209,14 +208,14 @@ export function VolunteerVerificationCard({
                 ) : (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-950/40 space-y-2"
+                    className="border-2 border-dashed border-slate-200 hover:border-emerald-500 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-50 space-y-2"
                   >
-                    <Camera className="w-8 h-8 mx-auto text-slate-400 animate-pulse" />
-                    <p className="text-xs text-slate-300 font-semibold">
-                      Click to upload or capture resolution proof photo
+                    <Camera className="w-7 h-7 mx-auto text-slate-400" />
+                    <p className="text-xs text-slate-700 font-medium">
+                      Upload post-rescue resolution photo
                     </p>
-                    <p className="text-[11px] text-slate-500">
-                      Supports JPG, PNG, WEBP — Audited automatically by Gemini 1.5 Flash Vision
+                    <p className="text-[11px] text-slate-400">
+                      Supports JPG, PNG, WEBP — Audited automatically by Gemini Vision
                     </p>
                   </div>
                 )}
@@ -232,22 +231,22 @@ export function VolunteerVerificationCard({
 
               {/* Field Notes */}
               <div className="space-y-1.5">
-                <label className="text-xs font-mono text-slate-400 uppercase tracking-wide">
-                  Field Action & Resolution Notes:
+                <label className="text-xs font-semibold text-slate-700">
+                  Field Action Notes:
                 </label>
                 <textarea
                   value={closureNotes}
                   onChange={(e) => setClosureNotes(e.target.value)}
                   rows={2}
-                  placeholder="e.g., Extrication complete. 4 casualties transferred to dry triage boat. No active peril remaining."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 resize-none font-sans"
+                  placeholder="e.g. Extrication complete. Casualties safely relocated. No remaining active peril."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 resize-none focus:bg-white"
                 />
               </div>
 
               {/* Error feedback */}
               {auditError && (
-                <div className="p-3 bg-red-950/60 border border-red-500/40 rounded-xl text-xs text-red-200 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-400" />
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-600" />
                   {auditError}
                 </div>
               )}
@@ -256,17 +255,17 @@ export function VolunteerVerificationCard({
               <button
                 onClick={handleSubmitVerification}
                 disabled={isAuditing}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xl shadow-emerald-600/20 transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-semibold text-xs shadow-sm transition-all cursor-pointer"
               >
                 {isAuditing ? (
                   <>
                     <Sparkles className="w-4 h-4 animate-spin text-white" />
-                    Gemini Vision Auditing Resolution Evidence...
+                    Auditing Resolution Evidence...
                   </>
                 ) : (
                   <>
                     <FileCheck className="w-4 h-4" />
-                    Submit AI Photo Audit & Verify Resolution
+                    Submit Verification & Close Mission
                   </>
                 )}
               </button>
@@ -274,8 +273,8 @@ export function VolunteerVerificationCard({
           )}
         </div>
       ) : (
-        <div className="p-8 text-center bg-slate-950/40 rounded-xl border border-slate-800 text-xs text-slate-400">
-          Select an assigned incident to submit resolution verification proof.
+        <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500">
+          Select an assigned incident to submit resolution proof.
         </div>
       )}
     </div>

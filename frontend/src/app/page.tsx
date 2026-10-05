@@ -26,9 +26,10 @@ import { VolunteerHub } from "@/components/portals/VolunteerHub";
 export default function Home() {
   const { user, role, isAuthenticated, logout, openAuthModal } = useAuth();
 
-  // Active Role Portal ("HQ_COMMANDER" | "CITIZEN" | "VOLUNTEER")
-  const [activePortal, setActivePortal] = useState<"HQ_COMMANDER" | "CITIZEN" | "VOLUNTEER">("HQ_COMMANDER");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  // Active Role Portal ("HQ_COMMANDER" | "CITIZEN" | "VOLUNTEER") — Default to CITIZEN
+  const [activePortal, setActivePortal] = useState<"HQ_COMMANDER" | "CITIZEN" | "VOLUNTEER">("CITIZEN");
+
+  const [theme, setTheme] = useState<"dark" | "light">("light");
 
   const [initialIncidents, setInitialIncidents] = useState<Incident[]>([]);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);

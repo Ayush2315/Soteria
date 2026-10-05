@@ -12,7 +12,8 @@ import hashlib
 from app.schemas.incident import MultimodalGeminiExtraction, VulnerableGroupBreakdown, SafetySOP
 from app.services.triage_engine import calculate_triage_score
 from app.models.incident import TriageCategory
-from app.api.v1.endpoints.relay import parse_packet, _crc, PACKET_VERSION
+from app.services.sms_codec import parse_packet, compute_crc, PACKET_HEADER
+
 
 
 def test_triage_engine_critical_calculation():

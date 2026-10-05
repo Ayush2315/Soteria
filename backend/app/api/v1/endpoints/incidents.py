@@ -16,6 +16,11 @@ from app.schemas.incident import (
     IncidentCreate,
     IncidentRead,
     IncidentUpdate,
+    IncidentTrackingStatusResponse,
+)
+from app.services.deduplication_service import (
+    find_and_merge_duplicate_incident,
+    generate_tracking_code,
 )
 
 logger = logging.getLogger("soteria.api.incidents")
@@ -110,10 +115,40 @@ async def create_incident(
 ) -> IncidentRead:
     triage_score, triage_category, entities, sop = _compute_preliminary_triage(incident_in)
 
-    # PostGIS Point format: SRID=4326;POINT(longitude latitude)
+    # 1. Spatial Deduplication Check (50m radius, 12h window)
+    hazard_types = entities.get("hazard_types", ["OTHER"])
+    primary_hazard = hazard_types[0] if hazard_types else "OTHER"
+    merged_incident, is_merged = await find_and_merge_duplicate_incident(
+        db=db,
+        latitude=incident_in.latitude,
+        longitude=incident_in.longitude,
+        hazard_type=primary_hazard,
+        raw_payload=incident_in.raw_payload or "",
+        source_channel=incident_in.source_type.value,
+        incoming_trapped=entities.get("trapped_count", 0),
+        client_timestamp=incident_in.client_timestamp,
+    )
+
+    if is_merged and merged_incident:
+        merged_read = IncidentRead.model_validate(merged_incident)
+        try:
+            await ws_manager.broadcast_incident(
+                event_type="INCIDENT_MERGED",
+                incident_data=merged_read.model_dump(mode="json"),
+                triage_breakdown={"reporter_count": merged_incident.reporter_count},
+            )
+        except Exception as e:
+            logger.warning(f"Failed to broadcast WebSocket merge event: {e}")
+        return merged_read
+
+    # 2. Novel Incident Creation
     point_wkt = f"SRID=4326;POINT({incident_in.longitude} {incident_in.latitude})"
+    tracking_code = generate_tracking_code()
 
     db_incident = Incident(
+        tracking_code=tracking_code,
+        reporter_count=1,
+        duplicate_metadata=[],
         source_type=incident_in.source_type,
         raw_payload=incident_in.raw_payload,
         audio_url=incident_in.audio_url,
@@ -147,6 +182,60 @@ async def create_incident(
         logger.warning(f"Failed to broadcast WebSocket event: {e}")
 
     return incident_read
+
+
+@router.get(
+    "/track/{tracking_code}",
+    response_model=IncidentTrackingStatusResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Track Incident Status by Human-Friendly Code",
+    description="Allows citizens to check real-time status: REPORTED -> TRIAGED -> DISPATCHED -> IN_PROGRESS -> RESOLVED",
+)
+async def track_incident(
+    tracking_code: str,
+    db: AsyncSession = Depends(get_db),
+) -> IncidentTrackingStatusResponse:
+    clean_code = tracking_code.strip().upper()
+    stmt = select(Incident).where(Incident.tracking_code == clean_code)
+    result = await db.execute(stmt)
+    incident = result.scalar_one_or_none()
+
+    if not incident:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Tracking code '{clean_code}' not found.",
+        )
+
+    # Format tracking response
+    hazard_types = (incident.extracted_entities or {}).get("hazard_types", ["OTHER"])
+    primary_hazard = hazard_types[0] if hazard_types else "OTHER"
+
+    assigned_vol = None
+    if incident.assigned_volunteer:
+        assigned_vol = {
+            "id": incident.assigned_volunteer.id,
+            "name": incident.assigned_volunteer.name,
+            "phone": incident.assigned_volunteer.phone,
+            "skills": incident.assigned_volunteer.skills,
+        }
+
+    return IncidentTrackingStatusResponse(
+        tracking_code=incident.tracking_code,
+        incident_id=incident.id,
+        status=incident.status,
+        triage_category=incident.triage_category,
+        triage_score=incident.triage_score,
+        hazard_type=primary_hazard,
+        location_name=incident.location_name,
+        latitude=incident.latitude,
+        longitude=incident.longitude,
+        reporter_count=incident.reporter_count or 1,
+        created_at=incident.created_at,
+        updated_at=incident.updated_at,
+        assigned_volunteer=assigned_vol,
+        verification_data=incident.verification_data or {},
+        safety_sop=incident.safety_sop or {},
+    )
 
 
 @router.get(

@@ -55,7 +55,7 @@ export function VolunteerHub({
   isAuthenticated,
   onLogout,
   onOpenAuth,
-  theme = "dark",
+  theme = "light",
   onToggleTheme,
   onIncidentResolved,
 }: VolunteerHubProps) {
@@ -133,7 +133,6 @@ export function VolunteerHub({
         currentVolunteerName
       );
       setReconSuccess(res.message);
-      // Synchronize with server
       await loadTasks();
     } catch (err: any) {
       console.error("Volunteer action failed:", err);
@@ -159,7 +158,6 @@ export function VolunteerHub({
       setReconSuccess(res.message);
       setReconNotes("");
 
-      // Optimistic UI update
       setTasks((prev) =>
         prev.map((t) =>
           t.task_id === task.task_id
@@ -168,7 +166,6 @@ export function VolunteerHub({
         )
       );
 
-      // Refresh tasks
       await loadTasks();
     } catch (err: any) {
       setReconSuccess(`Spot #${spotId} audit registered and shared with Logistics Command.`);
@@ -178,25 +175,25 @@ export function VolunteerHub({
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-on-background font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 font-sans">
       
       {/* ----------------------------------------------------------------------- */}
       {/* LEFT NAVIGATION RAIL (Desktop) */}
       {/* ----------------------------------------------------------------------- */}
-      <nav className="hidden md:flex w-64 shrink-0 bg-surface-container-low border-r border-outline-variant/40 flex-col justify-between z-40">
+      <nav className="hidden md:flex w-64 shrink-0 bg-white border-r border-slate-200 flex-col justify-between z-40">
         <div>
-          <div className="px-6 py-5 border-b border-outline-variant/40 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
+          <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-sm">
               <HeartPulse className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-emerald-400 font-black uppercase tracking-wider text-sm">VOLUNTEER HUB</h2>
-              <p className="text-on-surface-variant text-[11px] font-mono">Field Operations & Recon</p>
+              <h2 className="text-slate-900 font-bold uppercase tracking-wider text-xs">Volunteer Hub</h2>
+              <p className="text-slate-500 text-[11px]">Field Operations & Tasks</p>
             </div>
           </div>
 
           <div className="py-4 px-3 space-y-1">
-            <div className="px-3 pb-2 text-[10px] font-bold font-mono text-on-surface-variant uppercase tracking-wider">
+            <div className="px-3 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
               Operation Portals
             </div>
 
@@ -204,9 +201,9 @@ export function VolunteerHub({
               id="nav-hq-commander"
               type="button"
               onClick={() => onSwitchRole("HQ_COMMANDER")}
-              className="w-full flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/40 hover:text-on-surface px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer"
             >
-              <Crosshair className="w-4 h-4" />
+              <Crosshair className="w-4 h-4 text-slate-400" />
               <span>Command HQ</span>
             </button>
 
@@ -214,9 +211,9 @@ export function VolunteerHub({
               id="nav-citizen-portal"
               type="button"
               onClick={() => onSwitchRole("CITIZEN")}
-              className="w-full flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/40 hover:text-on-surface px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer"
             >
-              <Radio className="w-4 h-4" />
+              <Radio className="w-4 h-4 text-slate-400" />
               <span>Citizen SOS</span>
             </button>
 
@@ -225,52 +222,52 @@ export function VolunteerHub({
               id="nav-volunteer-hub"
               type="button"
               onClick={() => onSwitchRole("VOLUNTEER")}
-              className="w-full flex items-center gap-3 bg-emerald-500/15 text-emerald-400 border-l-4 border-emerald-400 px-3.5 py-2.5 rounded-r-lg text-xs font-bold transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 bg-emerald-50 text-emerald-800 border-l-4 border-emerald-600 px-3.5 py-2.5 rounded-r-lg text-xs font-semibold transition-all cursor-pointer"
             >
-              <HeartPulse className="w-4 h-4" />
+              <HeartPulse className="w-4 h-4 text-emerald-600" />
               <span>Volunteer Hub</span>
-              <span className="ml-auto text-[10px] px-1.5 py-0.2 rounded bg-emerald-950/60 text-emerald-300 font-mono">ACTIVE</span>
+              <span className="ml-auto text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium">Active</span>
             </button>
           </div>
 
           {/* Risk Level Protocol Legend */}
-          <div className="px-3 py-3 border-t border-outline-variant/30 space-y-2 text-xs">
-            <div className="text-[10px] font-bold font-mono text-on-surface-variant uppercase tracking-wider">
-              Risk Level Protocol
+          <div className="px-4 py-3 border-t border-slate-200 space-y-2 text-xs">
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              Safety Risk Legend
             </div>
-            <div className="space-y-1 text-[11px] font-mono">
-              <div className="flex items-center gap-2 text-red-400">
-                <span className="w-2 h-2 rounded-full bg-red-500" />
-                <span>Level 4: Extreme (Water PFD)</span>
+            <div className="space-y-1.5 text-xs text-slate-600">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-rose-500" />
+                <span>Level 4: Extreme Hazard (PFD / Boats)</span>
               </div>
-              <div className="flex items-center gap-2 text-amber-400">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                <span>Level 3: High (PPE + Boots)</span>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500" />
+                <span>Level 3: High Hazard (PPE & Boots)</span>
               </div>
-              <div className="flex items-center gap-2 text-cyan-400">
-                <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                <span>Level 2: Moderate (Recon)</span>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span>Level 2: Ground Recon</span>
               </div>
-              <div className="flex items-center gap-2 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Level 1: Low (Support)</span>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Level 1: General Support</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* User Card */}
-        <div className="p-4 border-t border-outline-variant/40 bg-surface-container-lowest text-xs">
+        <div className="p-4 border-t border-slate-200 bg-slate-50 text-xs">
           {isAuthenticated && user ? (
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-bold text-on-surface truncate max-w-[130px]">{user.full_name}</div>
-                <div className="text-[10px] font-mono text-emerald-400">CERTIFIED RESPONDER</div>
+                <div className="font-semibold text-slate-900 truncate max-w-[130px]">{user.full_name}</div>
+                <div className="text-[10px] text-emerald-700 font-medium">Certified Responder</div>
               </div>
               <button
                 type="button"
                 onClick={onLogout}
-                className="p-1.5 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -280,7 +277,7 @@ export function VolunteerHub({
             <button
               type="button"
               onClick={() => onOpenAuth("VOLUNTEER")}
-              className="w-full flex items-center justify-center gap-2 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-semibold transition-all cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Volunteer Sign In</span>
@@ -295,20 +292,20 @@ export function VolunteerHub({
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         
         {/* Top Header */}
-        <header className="h-14 shrink-0 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40 px-3 md:px-6 flex items-center justify-between gap-2 z-30">
+        <header className="h-14 shrink-0 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 flex items-center justify-between gap-2 z-30">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
-            <h1 className="text-sm md:text-base font-black tracking-tight text-on-surface truncate">VOLUNTEER HUB</h1>
-            <span className="hidden sm:inline px-2.5 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-[10px] font-mono text-emerald-300 font-bold">
-              QUOTA BALANCING
+            <h1 className="text-sm md:text-base font-bold text-slate-900 truncate">Volunteer Workspace</h1>
+            <span className="hidden sm:inline px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] text-emerald-800 font-medium">
+              Mission Quotas
             </span>
 
             {/* Mobile Tab Switcher */}
-            <div className="flex md:hidden bg-surface-container rounded-lg p-0.5 border border-outline-variant/40 text-xs">
+            <div className="flex md:hidden bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs">
               <button
                 type="button"
                 onClick={() => setMobileTab("tasks")}
-                className={`px-2 py-1 rounded font-bold transition-all ${
-                  mobileTab === "tasks" ? "bg-emerald-600 text-white" : "text-on-surface-variant"
+                className={`px-2 py-1 rounded font-semibold transition-all ${
+                  mobileTab === "tasks" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"
                 }`}
               >
                 Tasks ({tasks.length})
@@ -316,11 +313,11 @@ export function VolunteerHub({
               <button
                 type="button"
                 onClick={() => setMobileTab("verify")}
-                className={`px-2 py-1 rounded font-bold transition-all ${
-                  mobileTab === "verify" ? "bg-emerald-600 text-white" : "text-on-surface-variant"
+                className={`px-2 py-1 rounded font-semibold transition-all ${
+                  mobileTab === "verify" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"
                 }`}
               >
-                AI Proof
+                Verification
               </button>
             </div>
           </div>
@@ -330,19 +327,19 @@ export function VolunteerHub({
               type="button"
               onClick={loadTasks}
               disabled={loadingTasks}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-surface-container hover:bg-surface-variant border border-outline-variant/40 rounded-lg text-xs font-medium text-on-surface transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 transition-all cursor-pointer"
               title="Refresh Task Queue"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loadingTasks ? "animate-spin text-emerald-400" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingTasks ? "animate-spin text-emerald-600" : ""}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
             <button
               type="button"
               onClick={() => onSwitchRole("HQ_COMMANDER")}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container hover:bg-surface-variant border border-outline-variant/40 rounded-lg text-xs font-bold text-on-surface transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 transition-all cursor-pointer"
             >
-              <Crosshair className="w-3.5 h-3.5 text-primary" />
+              <Crosshair className="w-3.5 h-3.5 text-blue-600" />
               <span>Command HQ</span>
             </button>
           </div>
@@ -352,16 +349,16 @@ export function VolunteerHub({
         <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden p-3 md:p-6 gap-4 md:gap-6">
           
           {/* LEFT: Active Tasks & Quota Balancing */}
-          <div className={`flex-1 bg-surface-container rounded-xl border border-outline-variant/40 p-4 flex-col min-h-0 overflow-y-auto space-y-4 shadow-xl ${
+          <div className={`flex-1 bg-white rounded-2xl border border-slate-200 p-4 flex-col min-h-0 overflow-y-auto space-y-4 shadow-sm ${
             mobileTab === "verify" ? "hidden md:flex" : "flex"
           }`}>
             
-            <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3 flex-wrap gap-2">
-              <h3 className="text-xs font-bold font-mono text-on-surface uppercase tracking-wider flex items-center gap-2">
-                <Zap className="w-4 h-4 text-emerald-400" />
-                Active Missions & Ground Recon Tasks ({tasks.length})
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Zap className="w-4 h-4 text-emerald-600" />
+                Active Missions & Tasks ({tasks.length})
               </h3>
-              <span className="text-[10px] font-mono text-slate-400">Claim open slots to prevent over-deployment</span>
+              <span className="text-xs text-slate-500">Join to fulfill deployment quotas</span>
             </div>
 
             {/* Task Cards */}
@@ -378,51 +375,51 @@ export function VolunteerHub({
                     onClick={() => setSelectedTask(task)}
                     className={`p-4 rounded-xl border transition-all cursor-pointer space-y-3 ${
                       isSelected
-                        ? "bg-surface-variant border-emerald-500 shadow-lg"
-                        : "bg-surface-container hover:bg-surface-variant/40 border-outline-variant/40"
+                        ? "bg-emerald-50/50 border-emerald-500 shadow-sm"
+                        : "bg-white hover:border-slate-300 border-slate-200"
                     }`}
                   >
                     <div className="flex items-start justify-between flex-wrap gap-2">
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[11px] font-bold text-cyan-300">#{task.task_id}</span>
-                          <span className="text-xs font-bold text-on-surface">{task.title}</span>
+                          <span className="text-xs font-bold text-slate-900">#{task.task_id}</span>
+                          <span className="text-xs font-semibold text-slate-800">{task.title}</span>
                           {isApprovedSafe && (
-                            <span className="px-2 py-0.2 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold">
-                              ✓ VERIFIED SAFE
+                            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold">
+                              ✓ Verified Safe
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] font-mono text-on-surface-variant">{task.sector}</span>
+                        <span className="text-xs text-slate-500">{task.sector}</span>
                       </div>
 
                       {/* Risk Level Badge */}
                       <span
-                        className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${
+                        className={`px-2.5 py-0.5 rounded text-[10px] font-semibold shrink-0 ${
                           task.risk_level === 4
-                            ? "bg-red-950/80 text-red-300 border border-red-500/40 animate-pulse"
+                            ? "bg-rose-50 text-rose-700 border border-rose-200"
                             : task.risk_level === 3
-                            ? "bg-amber-950/80 text-amber-300 border border-amber-500/40"
-                            : "bg-cyan-950/80 text-cyan-300 border border-cyan-500/40"
+                            ? "bg-amber-50 text-amber-800 border border-amber-200"
+                            : "bg-blue-50 text-blue-700 border border-blue-200"
                         }`}
                       >
                         {task.risk_label}
                       </span>
                     </div>
 
-                    <p className="text-xs text-on-surface-variant">{task.description}</p>
+                    <p className="text-xs text-slate-600">{task.description}</p>
 
                     {/* Capacity Quota Bar & Self-Volunteering Action */}
-                    <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/30 space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-mono flex-wrap gap-2">
-                        <span className="text-on-surface-variant">Capacity Quota:</span>
-                        <span className={`font-bold ${isFull ? "text-amber-400" : "text-emerald-400"}`}>
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between text-xs flex-wrap gap-2">
+                        <span className="text-slate-500">Responders:</span>
+                        <span className={`font-semibold ${isFull ? "text-amber-800" : "text-emerald-700"}`}>
                           {task.current_volunteers} / {task.required_volunteers}{" "}
-                          {isFull ? "(QUOTA FULL - REDIRECT)" : "Responders Needed"}
+                          {isFull ? "(Quota Full)" : "Needed"}
                         </span>
                       </div>
 
-                      <div className="w-full h-2 rounded-full bg-surface-container-high overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${
                             isFull ? "bg-amber-500" : "bg-emerald-500"
@@ -438,8 +435,8 @@ export function VolunteerHub({
 
                       {/* Assigned Responders & Interactive Claim Button */}
                       <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
-                        <div className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                          <Users className="w-3 h-3 text-cyan-400" />
+                        <div className="text-[11px] text-slate-500 flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5 text-slate-400" />
                           <span>
                             {task.volunteer_names && task.volunteer_names.length > 0
                               ? `Assigned: ${task.volunteer_names.join(", ")}`
@@ -455,28 +452,28 @@ export function VolunteerHub({
                             handleToggleVolunteerQuota(task);
                           }}
                           disabled={actionInProgress === task.task_id || (!hasJoined && isFull)}
-                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1.5 ${
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all shadow-sm cursor-pointer flex items-center gap-1.5 ${
                             hasJoined
-                              ? "bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/40"
+                              ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
                               : isFull
-                              ? "bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed"
-                              : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20"
+                              ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                              : "bg-emerald-600 hover:bg-emerald-700 text-white"
                           }`}
                         >
                           {hasJoined ? (
                             <>
-                              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>Joined (Click to Leave)</span>
+                              <UserCheck className="w-3.5 h-3.5" />
+                              <span>Joined (Leave)</span>
                             </>
                           ) : isFull ? (
                             <>
                               <Lock className="w-3.5 h-3.5" />
-                              <span>Quota Full</span>
+                              <span>Full</span>
                             </>
                           ) : (
                             <>
                               <UserPlus className="w-3.5 h-3.5" />
-                              <span>Volunteer for Mission (+1)</span>
+                              <span>Join Mission (+1)</span>
                             </>
                           )}
                         </button>
@@ -484,10 +481,10 @@ export function VolunteerHub({
                     </div>
 
                     {/* Required PPE Badges */}
-                    <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
-                      <span className="text-slate-400">Required PPE:</span>
+                    <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+                      <span className="text-slate-400">Required Gear:</span>
                       {task.required_ppe.map((ppe, i) => (
-                        <span key={i} className="px-2 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                        <span key={i} className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
                           {ppe.replace("_", " ")}
                         </span>
                       ))}
@@ -495,18 +492,18 @@ export function VolunteerHub({
 
                     {/* If Ground Recon: Interactive Spot Audit Form */}
                     {task.is_spot_recon && task.target_spot_id && (
-                      <div className="pt-2 border-t border-outline-variant/30 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] font-mono text-cyan-300">
+                      <div className="pt-2 border-t border-slate-100 space-y-2">
+                        <div className="flex items-center justify-between text-xs text-slate-800 font-semibold">
                           <span>Ground Recon Audit for #{task.target_spot_id}</span>
-                          {isApprovedSafe && <span className="text-emerald-400 font-bold">✓ APPROVED SAFE FOR AIRDROP</span>}
+                          {isApprovedSafe && <span className="text-emerald-700 font-bold">✓ Approved Safe</span>}
                         </div>
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
-                            placeholder="Recon audit notes (e.g., Rooftop clear of cables, 25x25m dry pad ready)..."
+                            placeholder="Recon notes (e.g. Rooftop clear, dry pad ready)..."
                             value={reconNotes}
                             onChange={(e) => setReconNotes(e.target.value)}
-                            className="flex-1 bg-surface-container-low border border-outline-variant/50 rounded-lg px-2.5 py-1.5 text-xs text-on-surface focus:outline-none focus:border-emerald-500"
+                            className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white"
                           />
                           <button
                             type="button"
@@ -515,9 +512,9 @@ export function VolunteerHub({
                               handleVerifySpotSubmit(task, task.target_spot_id!, true);
                             }}
                             disabled={actionInProgress === task.target_spot_id}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs shadow cursor-pointer whitespace-nowrap"
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs shadow-sm cursor-pointer whitespace-nowrap"
                           >
-                            Approve Spot
+                            Approve
                           </button>
                           <button
                             type="button"
@@ -526,7 +523,7 @@ export function VolunteerHub({
                               handleVerifySpotSubmit(task, task.target_spot_id!, false);
                             }}
                             disabled={actionInProgress === task.target_spot_id}
-                            className="px-2.5 py-1.5 bg-red-950 hover:bg-red-900 text-red-200 border border-red-500/40 rounded-lg text-xs cursor-pointer whitespace-nowrap"
+                            className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs cursor-pointer whitespace-nowrap"
                           >
                             Reject
                           </button>
@@ -539,15 +536,15 @@ export function VolunteerHub({
             </div>
 
             {reconSuccess && (
-              <div className="p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-xl text-emerald-200 text-xs flex items-center justify-between animate-in fade-in">
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center justify-between animate-in fade-in">
                 <span className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   {reconSuccess}
                 </span>
                 <button
                   type="button"
                   onClick={() => setReconSuccess(null)}
-                  className="text-xs text-emerald-400 hover:text-emerald-200 underline ml-2 cursor-pointer"
+                  className="text-xs text-emerald-700 hover:text-emerald-900 underline ml-2 cursor-pointer"
                 >
                   Dismiss
                 </button>
@@ -555,25 +552,25 @@ export function VolunteerHub({
             )}
           </div>
 
-          {/* RIGHT: AI Closed-Loop Photo Verification & Closure */}
-          <div className={`shrink-0 bg-surface-container rounded-xl border border-outline-variant/40 p-4 flex-col min-h-0 overflow-y-auto space-y-4 shadow-xl ${
+          {/* RIGHT: Photo Verification & Closure */}
+          <div className={`shrink-0 bg-white rounded-2xl border border-slate-200 p-4 flex-col min-h-0 overflow-y-auto space-y-4 shadow-sm ${
             mobileTab === "tasks" ? "hidden md:flex md:w-[420px]" : "flex w-full md:w-[420px]"
           }`}>
             
-            <div className="border-b border-outline-variant/40 pb-3">
-              <h3 className="text-xs font-bold font-mono text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                AI Closed-Loop Photo Verification
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                Resolution Verification
               </h3>
-              <p className="text-[11px] text-on-surface-variant mt-1">
-                Upload post-rescue scene photo. Google Gemini Vision audits the resolution proof against initial hazard requirements.
+              <p className="text-xs text-slate-500 mt-1">
+                Upload post-rescue photo proof. Gemini Vision audits the evidence against initial hazard requirements.
               </p>
             </div>
 
             {/* Select Assigned Incident */}
             <div>
-              <label className="block text-xs font-bold text-on-surface mb-1">
-                Select Dispatched Ticket to Verify
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
+                Select Ticket to Verify
               </label>
               <select
                 value={selectedIncidentForVerification?.id || ""}
@@ -581,7 +578,7 @@ export function VolunteerHub({
                   const found = incidents.find((i) => i.id === parseInt(e.target.value));
                   if (found) setSelectedIncidentForVerification(found);
                 }}
-                className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl p-2.5 text-xs text-on-surface focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-500"
               >
                 {incidents.map((inc) => (
                   <option key={inc.id} value={inc.id}>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import DeckGL from "@deck.gl/react/typed";
 import { Map } from "react-map-gl/maplibre";
 import { HexagonLayer } from "@deck.gl/aggregation-layers/typed";
@@ -23,18 +23,18 @@ import {
   Sliders,
 } from "lucide-react";
 
-// CartoDB Dark Matter style JSON for open-access dark aesthetic
-const CARTO_DARK_MATTER_STYLE =
-  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+// CartoDB Positron style JSON for crisp, bright, minimal cartography
+const CARTO_POSITRON_STYLE =
+  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-// 6-class emergency severity color palette
+// 6-class emergency severity color palette (clean & accessible)
 const HEXAGON_COLOR_RANGE: [number, number, number][] = [
   [16, 185, 129],  // Low (Emerald 500)
   [52, 211, 153],  // Low-Moderate (Emerald 400)
   [251, 191, 36],  // Moderate (Amber 400)
   [245, 158, 11],  // Urgent-Moderate (Amber 500)
   [249, 115, 22],  // Urgent (Orange 500)
-  [239, 68, 68],   // Critical (Red 500)
+  [225, 29, 72],   // Critical (Rose 600)
 ];
 
 interface DisasterGISMapProps {
@@ -115,21 +115,34 @@ export function DisasterGISMap({
   const [viewState, setViewState] = useState<any>({
     longitude: 81.8463,
     latitude: 25.4358,
-    zoom: 12.5,
-    pitch: 45,
-    bearing: -15,
+    zoom: 12.8,
+    pitch: 0,
+    bearing: 0,
     maxZoom: 20,
     minZoom: 3,
   });
 
   // Layer & Display Controls
   const [layerMode, setLayerMode] = useState<"both" | "hexagons" | "pins">("both");
-  const [is3D, setIs3D] = useState(true);
-  const [hexRadius, setHexRadius] = useState(500);
-  const [elevationScale, setElevationScale] = useState(15);
+  const [is3D, setIs3D] = useState(false);
+  const [hexRadius, setHexRadius] = useState(350);
+  const [elevationScale, setElevationScale] = useState(4);
   const [hoverInfo, setHoverInfo] = useState<any>(null);
+  const deckRef = useRef<any>(null);
 
-  // Recenter camera when selected incident changes externally
+  // Explicitly finalize Deck.gl and release WebGL contexts on unmount
+  useEffect(() => {
+    return () => {
+      if (deckRef.current && deckRef.current.deck) {
+        try {
+          deckRef.current.deck.finalize();
+        } catch (err) {
+          console.warn("Deck.gl finalize cleanup non-fatal:", err);
+        }
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (selectedIncident && selectedIncident.longitude && selectedIncident.latitude) {
       setViewState((prev: any) => ({
@@ -355,10 +368,11 @@ export function DisasterGISMap({
   ]);
 
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl bg-slate-950">
+    <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
       
       {/* Deck.gl Canvas Overlay strictly confined within bounded box */}
       <DeckGL
+        ref={deckRef}
         viewState={viewState}
         onViewStateChange={(e: any) => setViewState(e.viewState)}
         controller={{ doubleClickZoom: false, dragRotate: true }}
@@ -389,9 +403,9 @@ export function DisasterGISMap({
                 longitude: coords[0],
                 latitude: coords[1],
                 zoom: isSinglePin ? 15.0 : 14.5,
-                pitch: 50,
-                bearing: -15,
-                transitionDuration: 1000,
+                pitch: is3D ? 30 : 0,
+                bearing: 0,
+                transitionDuration: 800,
                 transitionInterpolator: new FlyToInterpolator(),
               }));
               const clusterData = buildClusterData(clusterIncidents, coords, isSinglePin);
@@ -411,7 +425,7 @@ export function DisasterGISMap({
         <Map
           reuseMaps
           mapLib={import("maplibre-gl")}
-          mapStyle={CARTO_DARK_MATTER_STYLE}
+          mapStyle={CARTO_POSITRON_STYLE}
         />
       </DeckGL>
 
@@ -422,39 +436,39 @@ export function DisasterGISMap({
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2 flex-wrap">
         
         {/* Layer View Mode Switcher */}
-        <div className="bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-lg text-xs">
+        <div className="bg-white/95 backdrop-blur-md p-1 rounded-lg border border-slate-200 flex items-center gap-1 shadow-sm text-xs">
           <button
             type="button"
             onClick={() => setLayerMode("both")}
-            className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+            className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
               layerMode === "both"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-slate-900 text-white shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            All Layers
+            All
           </button>
           <button
             type="button"
             onClick={() => setLayerMode("hexagons")}
-            className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+            className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
               layerMode === "hexagons"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-slate-900 text-white shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            3D Hexagons
+            Density
           </button>
           <button
             type="button"
             onClick={() => setLayerMode("pins")}
-            className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+            className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
               layerMode === "pins"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-slate-900 text-white shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            Pins Only
+            Pins
           </button>
         </div>
 
@@ -462,85 +476,83 @@ export function DisasterGISMap({
         <button
           type="button"
           onClick={toggle3D}
-          className={`p-2 rounded-xl border shadow-lg transition-all flex items-center gap-1.5 text-xs font-semibold ${
+          className={`px-2.5 py-1.5 rounded-lg border shadow-sm transition-colors flex items-center gap-1.5 text-xs font-medium ${
             is3D
-              ? "bg-indigo-600/90 border-indigo-500 text-white shadow-indigo-600/20"
-              : "bg-slate-900/90 border-slate-800 text-slate-300 hover:bg-slate-800"
+              ? "bg-slate-900 border-slate-900 text-white"
+              : "bg-white/95 border-slate-200 text-slate-700 hover:bg-slate-50"
           }`}
           title="Toggle 2D / 3D Extrusion"
         >
-          <Box className="w-4 h-4" />
-          <span>{is3D ? "3D Extruded" : "2D Flat"}</span>
+          <Box className="w-3.5 h-3.5" />
+          <span>{is3D ? "3D Extrusion" : "2D Map"}</span>
         </button>
 
         {/* Reset Camera View */}
         <button
           type="button"
           onClick={handleResetCamera}
-          className="p-2 bg-slate-900/90 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 shadow-lg transition-colors cursor-pointer"
+          className="p-1.5 bg-white/95 hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 shadow-sm transition-colors cursor-pointer"
           title="Reset Camera Center"
         >
-          <Compass className="w-4 h-4" />
+          <Compass className="w-4 h-4 text-slate-600" />
         </button>
       </div>
 
       {/* Floating 3D Parameters Controls (Bottom Left) */}
       {is3D && layerMode !== "pins" && (
-        <div className="absolute bottom-4 left-4 z-30 bg-slate-900/90 backdrop-blur-md p-3 rounded-xl border border-slate-800 shadow-xl space-y-2 text-xs w-64">
-          <div className="flex items-center justify-between text-slate-300 font-medium">
+        <div className="absolute bottom-4 left-4 z-30 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-slate-200 shadow-lg space-y-2 text-xs w-60">
+          <div className="flex items-center justify-between text-slate-700 font-medium">
             <span className="flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-indigo-400" />
-              Hexagon Radius
+              <Sliders className="w-3.5 h-3.5 text-slate-500" />
+              Radius
             </span>
-            <span className="font-mono text-indigo-300">{hexRadius}m</span>
+            <span className="font-mono text-slate-900 font-bold">{hexRadius}m</span>
           </div>
           <input
             type="range"
-            min="200"
-            max="1200"
+            min="150"
+            max="800"
             step="50"
             value={hexRadius}
             onChange={(e) => setHexRadius(Number(e.target.value))}
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
           />
-
-          <div className="flex items-center justify-between text-slate-300 font-medium pt-1">
-            <span>Height Extrusion</span>
-            <span className="font-mono text-indigo-300">{elevationScale}x</span>
+          <div className="flex items-center justify-between text-slate-700 font-medium pt-1">
+            <span>Elevation</span>
+            <span className="font-mono text-slate-900 font-bold">{elevationScale}x</span>
           </div>
           <input
             type="range"
-            min="5"
-            max="40"
+            min="1"
+            max="10"
             step="1"
             value={elevationScale}
             onChange={(e) => setElevationScale(Number(e.target.value))}
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
           />
         </div>
       )}
 
       {/* Live Map Legend (Bottom Right) */}
-      <div className="absolute bottom-4 right-4 z-30 bg-slate-900/90 backdrop-blur-md p-2.5 rounded-xl border border-slate-800 shadow-xl text-[11px] flex items-center gap-3 font-mono">
-        <span className="text-slate-400">Risk Intensity:</span>
-        <div className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" title="Low (0-39)" />
-          <span className="text-slate-300">P4</span>
+      <div className="absolute bottom-4 right-4 z-30 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm text-[11px] flex items-center gap-3 font-medium text-slate-600">
+        <span className="text-slate-500 font-semibold">Priority:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+          <span className="text-slate-700">P4</span>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#FBBF24]" title="Moderate (40-59)" />
-          <span className="text-slate-300">P3</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+          <span className="text-slate-700">P3</span>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" title="Urgent (60-79)" />
-          <span className="text-slate-300">P2</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+          <span className="text-slate-700">P2</span>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] animate-pulse" title="Critical (80-100)" />
-          <span className="text-red-400 font-bold">P1</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
+          <span className="text-rose-600 font-bold">P1 Critical</span>
         </div>
       </div>
-
     </div>
   );
 }

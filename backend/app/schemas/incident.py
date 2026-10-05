@@ -146,6 +146,9 @@ class IncidentRead(IncidentBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    tracking_code: str = Field(..., description="Human-readable tracking code (e.g. SOT-8821)")
+    reporter_count: int = Field(1, description="Number of clustered duplicate reports")
+    duplicate_metadata: List[Dict[str, Any]] = Field(default_factory=list)
     triage_score: float
     triage_category: TriageCategory
     status: IncidentStatus
@@ -158,6 +161,24 @@ class IncidentRead(IncidentBase):
 
     class Config:
         from_attributes = True
+
+
+class IncidentTrackingStatusResponse(BaseModel):
+    tracking_code: str
+    incident_id: int
+    status: IncidentStatus
+    triage_category: TriageCategory
+    triage_score: float
+    hazard_type: str
+    location_name: Optional[str] = None
+    latitude: float
+    longitude: float
+    reporter_count: int = 1
+    created_at: datetime
+    updated_at: datetime
+    assigned_volunteer: Optional[Dict[str, Any]] = None
+    verification_data: Optional[Dict[str, Any]] = None
+    safety_sop: Optional[Dict[str, Any]] = None
 
 
 # --- Complete Multimodal Triage API Response ---

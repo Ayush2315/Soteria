@@ -53,6 +53,13 @@ class Incident(Base):
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
+    # Human-Friendly Tracking Code for Citizen Status (e.g. SOT-8821)
+    tracking_code = Column(String(32), unique=True, index=True, nullable=False)
+
+    # Spatial Clustering & Deduplication
+    reporter_count = Column(Integer, default=1, nullable=False)
+    duplicate_metadata = Column(JSON, default=list, nullable=False)
+
     # Input Modality
     source_type = Column(
         SQLEnum(SourceType), default=SourceType.TEXT, nullable=False, index=True
