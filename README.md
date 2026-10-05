@@ -2,20 +2,25 @@
 
 > **"From Chaos to Clarity — Disaster Response at the Speed of AI"**
 
+---
+
+### 🌐 **Live Deployed Application**
+👉 **[https://soteria-smoky.vercel.app/](https://soteria-smoky.vercel.app/)**
+
+[![Live App](https://img.shields.io/badge/Deployed_App-soteria--smoky.vercel.app-10b981?style=for-the-badge&logo=vercel&logoColor=white)](https://soteria-smoky.vercel.app/)
+[![Watch SOTERIA Demo Video](https://img.shields.io/badge/Demo_Video-YouTube-red?style=for-the-badge&logo=youtube)](https://youtu.be/T1Tsvi1kWtc)
+
+> 🚀 **Live Production Link:** [https://soteria-smoky.vercel.app/](https://soteria-smoky.vercel.app/)  
+> 📺 **Live Video Walkthrough:** [https://youtu.be/cAeYs-JFpYo](https://youtu.be/cAeYs-JFpYo)
+
+---
+
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI_(Python_3.11+)-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js_14_(App_Router)-000000.svg?logo=next.js&logoColor=white)](https://nextjs.org)
 [![Deck.gl](https://img.shields.io/badge/3D_GIS-Deck.gl_WebGL_+_MapLibre-FF4081.svg?logo=webgl&logoColor=white)](https://deck.gl)
 [![PostGIS](https://img.shields.io/badge/Database-PostgreSQL_16_+_PostGIS_3.4-336791.svg?logo=postgresql&logoColor=white)](https://postgis.net)
 [![Google Gemini](https://img.shields.io/badge/AI_Engine-Google_Gemini_1.5_Flash-4285F4.svg?logo=google&logoColor=white)](https://aistudio.google.com)
 [![Docker](https://img.shields.io/badge/Deployment-Docker_Compose-2496ED.svg?logo=docker&logoColor=white)](https://docker.com)
-
----
-
-
-
-[![Watch SOTERIA Demo Video](https://img.shields.io/badge/Demo_Video-YouTube-red?style=for-the-badge&logo=youtube)](https://youtu.be/T1Tsvi1kWtc)
-
-> 📺 **Live Video Walkthrough:** https://youtu.be/T1Tsvi1kWtc
 
 ## 👥 Team Aflatoon
 
@@ -41,7 +46,7 @@ In the initial golden hours of a catastrophic disaster (floods, earthquakes, str
 
 ### The Soteria Solution:
 
-> **"From Chaos to Clarity — Disaster Response at the Speed of AI"**  
+> **"From Chaos to Clarity — Disaster Response at the Speed of AI"**
 > SOTERIA transforms unstructured human communication into prioritized, mathematically triaged, geospatially indexed operations. Crucially, **when cellular connectivity is severed for 5+ days, SOTERIA does not strand citizens** — it activates a **Store-Carry-Forward Delay-Tolerant Relay Mesh** (160-char SOT1 packets via QR hand-off, 2G SMS gateways, and Relief Camp Kiosks).
 
 ---
@@ -50,17 +55,17 @@ In the initial golden hours of a catastrophic disaster (floods, earthquakes, str
 
 *How SOTERIA compares against conventional disaster tools:*
 
-| Capability | SOTERIA | NDMA Sachet / 112 | Ushahidi / Google SOS | WhatsApp / Social Media Groups |
-| :--- | :---: | :---: | :---: | :---: |
-| **5-Day Network Blackout Operation** | ✅ **Yes (SOT1 QR/SMS/Kiosk Mesh)** | ❌ No (Requires cellular data) | ❌ No (Requires internet) | ❌ No (Total failure) |
-| **Regional Dialect Voice SOS** | ✅ **Bhojpuri, Awadhi, Hindi, English** | ❌ Form / English-centric | ❌ Text only | ❌ Manual listening required |
-| **Deterministic Auditable Triage** | ✅ **0–100 Mathematical Formula** | ❌ Manual queueing | ❌ Tagging only | ❌ None (Chaos) |
-| **Explainable AI Transparency** | ✅ **5 Factor Sub-Scores Visible** | ❌ Opaque | ❌ N/A | ❌ N/A |
-| **Closed-Loop Visual Proof Audit** | ✅ **Gemini Vision Verification** | ❌ Verbal closure | ❌ Manual review | ❌ Unverified |
-| **Proximity Volunteer Dispatch** | ✅ **PostGIS Geodesic (`ST_DWithin`)** | ❌ Regional broadcast | ❌ Map pins only | ❌ Manual phone calls |
-| **Relief Camp Offline Kiosk Sync** | ✅ **Yes (Local LAN Auto-Sync)** | ❌ Cloud only | ❌ Cloud only | ❌ Cloud only |
+| Capability                                 |                    SOTERIA                    |       NDMA Sachet / 112       |   Ushahidi / Google SOS   | WhatsApp / Social Media Groups |
+| :----------------------------------------- | :-------------------------------------------: | :----------------------------: | :-----------------------: | :----------------------------: |
+| **5-Day Network Blackout Operation** |   ✅**Yes (SOT1 QR/SMS/Kiosk Mesh)**   | ❌ No (Requires cellular data) | ❌ No (Requires internet) |     ❌ No (Total failure)     |
+| **Regional Dialect Voice SOS**       | ✅**Bhojpuri, Awadhi, Hindi, English** |   ❌ Form / English-centric   |       ❌ Text only       |  ❌ Manual listening required  |
+| **Deterministic Auditable Triage**   |    ✅**0–100 Mathematical Formula**    |       ❌ Manual queueing       |      ❌ Tagging only      |        ❌ None (Chaos)        |
+| **Explainable AI Transparency**      |    ✅**5 Factor Sub-Scores Visible**    |           ❌ Opaque           |          ❌ N/A          |             ❌ N/A             |
+| **Closed-Loop Visual Proof Audit**   |    ✅**Gemini Vision Verification**    |       ❌ Verbal closure       |     ❌ Manual review     |         ❌ Unverified         |
+| **Proximity Volunteer Dispatch**     | ✅**PostGIS Geodesic (`ST_DWithin`)** |     ❌ Regional broadcast     |     ❌ Map pins only     |     ❌ Manual phone calls     |
+| **Relief Camp Offline Kiosk Sync**   |     ✅**Yes (Local LAN Auto-Sync)**     |         ❌ Cloud only         |       ❌ Cloud only       |         ❌ Cloud only         |
 
-*For in-depth field data, interview transcripts, and research citations, see [`docs/USER_RESEARCH.md`](file:///f:/Soteria/docs/USER_RESEARCH.md).*  
+*For in-depth field data, interview transcripts, and research citations, see [`docs/USER_RESEARCH.md`](file:///f:/Soteria/docs/USER_RESEARCH.md).*
 *For human oversight, ethical AI principles, and privacy protections, see [`docs/PRIVACY.md`](file:///f:/Soteria/docs/PRIVACY.md).*
 
 ---
@@ -69,7 +74,7 @@ In the initial golden hours of a catastrophic disaster (floods, earthquakes, str
 
 ```
                                   SOTERIA PLATFORM ARCHITECTURE
-                                
+                              
     ┌─────────────────────────── CLIENT & INTERACTION LAYER ──────────────────────────┐
     │                                                                                 │
     │   [ 🖥️ COMMANDER HQ ]         [ 📱 CITIZEN PORTAL ]      [ 🚑 VOLUNTEER HUB ]   │
@@ -245,11 +250,12 @@ npm run dev
 
 ---
 
-## 🌐 Live Service URLs
+## 🌐 Live Service & Deployment URLs
 
 | Service                        | URL                                                                       | Description                                            |
 | :----------------------------- | :------------------------------------------------------------------------ | :----------------------------------------------------- |
-| **Web Application**      | [http://localhost:3000](http://localhost:3000)                             | Master Multi-Role Interface (HQ / Citizen / Volunteer) |
+| **🌐 Production Web App (Vercel)** | **[https://soteria-smoky.vercel.app/](https://soteria-smoky.vercel.app/)** | **Live Deployed Production Platform (Citizen / HQ / Volunteer)** |
+| **Local Web Application**      | [http://localhost:3000](http://localhost:3000)                             | Local Multi-Role Interface (HQ / Citizen / Volunteer) |
 | **FastAPI Swagger Docs** | [http://localhost:8000/docs](http://localhost:8000/docs)                   | Interactive OpenAPI Documentation                      |
 | **Health Check**         | [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health) | PostGIS & System Status Telemetry                      |
 | **WebSocket Stream**     | `ws://localhost:8000/ws/incidents`                                      | Real-time Incident & Dispatch Stream                   |
@@ -272,7 +278,7 @@ The login gateway includes **1-Click Demo Buttons** for instant login:
 
 ### Step 1: Zero-Barrier Hindi Voice SOS Intake
 
-1. Go to [http://localhost:3000](http://localhost:3000) and click **"Citizen SOS"** on the left rail.
+1. Go to [https://soteria-smoky.vercel.app/](https://soteria-smoky.vercel.app/) (or `http://localhost:3000` locally) and click **"Citizen SOS"** on the left rail.
 2. Hold or tap the glowing **1-Tap SOS** button to record an audio message in Hindi (e.g., *"बाढ़ का पानी छत तक पहुँच गया है! 4 लोग फंसे हैं, नाव भेजो!"*).
 3. Click **"Transmit Emergency SOS Ticket"**.
 4. Observe the instant AI extraction (trapped count: 4, category: `CRITICAL_P1`, confidence: 98%).
