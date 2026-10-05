@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SOTERIA - Volunteer Mission Briefing</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Theme Config -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "tertiary-fixed": "#d8e3fb",
+                "secondary-fixed-dim": "#e9c400",
+                "inverse-on-surface": "#eaf1ff",
+                "on-surface": "#0b1c30",
+                "error": "#ba1a1a",
+                "secondary-container": "#fcd400",
+                "error-container": "#ffdad6",
+                "on-primary-fixed-variant": "#842500",
+                "surface-bright": "#f8f9ff",
+                "on-secondary-fixed-variant": "#544600",
+                "on-secondary": "#ffffff",
+                "secondary-fixed": "#ffe16d",
+                "on-error": "#ffffff",
+                "inverse-surface": "#213145",
+                "tertiary-fixed-dim": "#bcc7de",
+                "on-tertiary": "#ffffff",
+                "primary": "#a93100",
+                "on-tertiary-container": "#fefcff",
+                "surface-dim": "#cbdbf5",
+                "surface-variant": "#d3e4fe",
+                "surface-container-lowest": "#ffffff",
+                "secondary": "#705d00",
+                "inverse-primary": "#ffb59e",
+                "on-surface-variant": "#5c4037",
+                "outline": "#916f65",
+                "surface-container-highest": "#d3e4fe",
+                "tertiary-container": "#6a758a",
+                "primary-fixed-dim": "#ffb59e",
+                "outline-variant": "#e6beb2",
+                "primary-container": "#d34000",
+                "on-tertiary-fixed-variant": "#3c475a",
+                "on-secondary-fixed": "#221b00",
+                "surface-container": "#e5eeff",
+                "surface-tint": "#ad3300",
+                "on-tertiary-fixed": "#111c2d",
+                "background": "#f8f9ff",
+                "surface-container-high": "#dce9ff",
+                "on-background": "#0b1c30",
+                "surface": "#f8f9ff",
+                "surface-container-low": "#eff4ff",
+                "primary-fixed": "#ffdbd0",
+                "on-primary-fixed": "#3a0b00",
+                "on-primary-container": "#fffbff",
+                "on-secondary-container": "#6e5c00",
+                "tertiary": "#515c71",
+                "on-error-container": "#93000a",
+                "on-primary": "#ffffff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "xs": "4px",
+                "sm": "12px",
+                "md": "24px",
+                "base": "8px",
+                "margin-mobile": "16px",
+                "gutter": "16px",
+                "lg": "40px",
+                "xl": "64px",
+                "margin-desktop": "32px",
+                "panel-padding": "20px",
+                "unit": "4px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "Inter"
+                ],
+                "code-data": [
+                        "JetBrains Mono"
+                ],
+                "label-sm": [
+                        "JetBrains Mono"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ],
+                "body-lg-bold": [
+                        "Inter"
+                ],
+                "body-base": ["Inter"],
+                "body-sm": ["Inter"],
+                "mono-data": ["JetBrains Mono"],
+                "headline-md": ["Inter"],
+                "mono-label": ["JetBrains Mono"]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "code-data": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg-bold": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "mono-data": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "mono-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+        }
+},
+    },
+  }
+</script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-surface');
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Tactical animations */
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(186, 26, 26, 0.5); box-shadow: 0 0 0 0 rgba(186, 26, 26, 0); }
+            50% { border-color: rgba(186, 26, 26, 1); box-shadow: 0 0 8px 0 rgba(186, 26, 26, 0.4); }
+        }
+        .risk-pulse {
+            animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Custom scrollbar for data feeds */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant');
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.primary-fixed-dim');
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-primary/30 selection:text-primary-fixed">
+<!-- JSON: SideNavBar (Active: Volunteer Hub) -->
+<nav class="hidden md:flex flex-col bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/30 h-screen w-64 fixed left-0 top-0 z-40 pt-16">
+<div class="px-6 py-4 border-b border-outline-variant/20 mb-4">
+<h2 class="text-primary font-bold uppercase tracking-widest text-mono-label font-mono-label mb-1">STRATEGIC OPS</h2>
+<p class="text-on-surface-variant text-[10px] uppercase font-mono-label tracking-widest">Global Response</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<!-- Inactive -->
+<li class="">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-container-high transition-all duration-150 px-4 py-3 text-mono-label font-mono-label" href="#">
+<span class="material-symbols-outlined text-[18px]">security</span>
+<span class="">Command HQ</span>
+</a>
+</li>
+<!-- Inactive -->
+<li class="">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-container-high transition-all duration-150 px-4 py-3 text-mono-label font-mono-label" href="#">
+<span class="material-symbols-outlined text-[18px]">groups</span>
+<span class="">Citizen Portal</span>
+</a>
+</li>
+<!-- ACTIVE: Volunteer Hub -->
+<li class="">
+<a class="flex items-center gap-3 bg-primary/10 text-primary border-l-4 border-primary px-4 py-3 text-mono-label font-mono-label" href="#">
+<span class="material-symbols-outlined text-[18px]">volunteer_activism</span>
+<span class="">Volunteer Hub</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- Footer Tabs -->
+<div class="border-t border-outline-variant/20 p-4">
+<ul class="flex justify-between items-center text-on-surface-variant/50 text-[10px] font-mono-label uppercase">
+<li class="flex flex-col items-center gap-1 hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span class="">WebSocket</span>
+</li>
+<li class="flex flex-col items-center gap-1 hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">map</span>
+<span class="">PostGIS</span>
+</li>
+<li class="flex flex-col items-center gap-1 hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">api</span>
+<span class="">Swagger</span>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col min-w-0 md:ml-64 relative bg-background">
+<!-- Global Tactical Background Map (Opacity 5%) -->
+<div class="absolute inset-0 z-0 opacity-5 bg-cover bg-center mix-blend-screen pointer-events-none" data-location="Sector 7 Evacuation Grid" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkLQx2FtphwNNL8UUVs4isr_V_wYpK1knS9rnH41uMLmbrRz8esTEMpRBq6DwdzVjmE3q4T8EYTov_Qo9IgwYbWGovmXGWSuwYMl5bxvh4rXXXZQjqVMjfoS65d0xD5n-AcFVpXNiDA7iSZOUOPQWEwTOfWMRmupIF3u3ozlYX-H5TDp7MKl3jcBJgM58cpSY_ezARI70GnTwWhVYodaEsJ6A8U5XO0FKIIhH2muvGoaPZWoza2ixk6w')"></div>
+<!-- JSON: TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md backdrop-blur-xl border-b border-outline-variant/20 flex justify-between items-center w-full px-margin-desktop h-16 z-50 sticky top-0">
+<div class="flex items-center gap-4">
+<span class="text-headline-md font-headline-md font-black tracking-tighter text-on-surface dark:text-primary">SOTERIA</span>
+</div>
+<div class="flex items-center gap-6">
+<!-- Status LED -->
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="text-primary dark:text-primary-fixed-dim text-mono-label font-mono-label tracking-widest uppercase">ENGINE ACTIVE</span>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant/50"></div>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 overflow-y-auto p-margin-desktop z-10 pb-20 relative">
+<!-- Page Header -->
+<div class="mb-6 flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<div>
+<h1 class="text-headline-md font-headline-md text-on-surface mb-1">MISSION BRIEFING</h1>
+<p class="text-body-sm font-body-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">my_location</span>
+                        SECTOR 7-ALPHA // URBAN COLLAPSE ZONE
+                    </p>
+</div>
+<div class="text-right">
+<p class="text-mono-label font-mono-label text-outline uppercase tracking-widest mb-1">Deployment Time</p>
+<p class="text-mono-data font-mono-data text-primary-fixed-dim">T-MINUS 00:14:45</p>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+<!-- Main Mission Card (Left side, large) -->
+<section class="xl:col-span-8 bg-surface-container-low border border-outline-variant/30 rounded-lg p-panel-padding flex flex-col relative overflow-hidden">
+<div class="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+<div class="flex justify-between items-start mb-6 relative z-10">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary text-[28px]">domain_disabled</span>
+<h2 class="text-[28px] leading-tight font-display-lg text-on-surface tracking-tight">Structural Evacuation</h2>
+</div>
+<p class="text-body-base font-body-base text-on-surface-variant max-w-2xl">
+Primary task: Clear designated residential complex blocks C through F. Imminent risk of secondary structural failure detected via seismic sensors. Proceed with extreme caution.
+</p>
+</div>
+<div class="bg-error-container/10 border border-error risk-pulse px-3 py-2 rounded flex flex-col items-center justify-center min-w-[80px]">
+<span class="material-symbols-outlined text-error mb-1 text-[20px]">warning</span>
+<span class="text-error font-mono-label text-[10px] tracking-widest uppercase">Risk Level 4</span>
+</div>
+</div>
+<div class="w-full h-48 border border-outline-variant/30 rounded bg-surface-dim relative overflow-hidden group mt-auto">
+<div class="absolute inset-0 bg-cover bg-center opacity-70 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDaz0gKxwmEz7jL9DGKCXMNi-_DeaRRfz0Ig8lp6FJafiKTOm2UE_ZXBPa6_MzfwfYyaqxoKPEwZNQskHICv7xbUfnemE1xatuEC7arKazsm_XFi41WWXVm1X4treEH8CtB5VCD-cqjpC34fqwRz5rzZ6tspvKP5ypZlh2cFD3U-XP6wYwSbNVDlm3mWOajK7x1-TSxsavSBG5fi745aTvw8RdqBxFrfx0VEnscu5_dvKJ7jcmWqSlMXQ')"></div>
+<div class="absolute top-2 left-2 flex gap-2">
+<span class="bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 text-[10px] font-mono-data text-primary">N 34.0522</span>
+<span class="bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 text-[10px] font-mono-data text-primary">W 118.2437</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-error-container/80 backdrop-blur-sm border border-error px-2 py-1 text-[10px] font-mono-label text-error uppercase tracking-widest flex items-center gap-1">
+<span class="relative flex h-1.5 w-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span><span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-error"></span></span>
+HOT ZONE
+</div>
+</div>
+</section>
+<!-- AI Safety SOP (Right side, top) -->
+<aside class="xl:col-span-4 bg-error-container/20 border border-error/20 rounded-lg p-panel-padding flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-error/5 blur-3xl rounded-full"></div>
+<div class="flex items-center gap-2 mb-4 border-b border-error/20 pb-3">
+<span class="material-symbols-outlined text-error fill text-[20px]">smart_toy</span>
+<h3 class="text-body-base font-headline-md text-error tracking-wide uppercase">AI Safety SOP</h3>
+</div>
+<ul class="space-y-4 flex-1">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-error/70 text-[16px] mt-0.5">report</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant"><strong class="text-on-surface">Toxic Dust Alert:</strong> Respiratory hazard confirmed. Full face mask required beyond Perimeter Alpha.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-error/70 text-[16px] mt-0.5">electric_bolt</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant"><strong class="text-on-surface">Exposed Wiring:</strong> Level 3 substations flooded. Do not touch submerged metallic surfaces.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-error/70 text-[16px] mt-0.5">collapse_all</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant"><strong class="text-on-surface">Load-Bearing Failure:</strong> Avoid Zone C entirely. AI structural analysis predicts 80% collapse probability within 2 hours.</p>
+</li>
+</ul>
+</aside>
+<!-- Gear Checklist (Bottom Left) -->
+<section class="xl:col-span-5 bg-surface-container-low border border-outline-variant/30 rounded-lg p-panel-padding">
+<div class="flex items-center gap-2 mb-4 border-b border-outline-variant/20 pb-3">
+<span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
+<h3 class="text-body-base font-headline-md text-on-surface tracking-wide uppercase">Pre-Deployment Gear</h3>
+</div>
+<div class="space-y-2">
+<label class="flex items-center gap-3 p-2 hover:bg-surface-variant/30 rounded cursor-pointer transition-colors border border-transparent hover:border-outline-variant/30">
+<input class="w-4 h-4 rounded border-outline-variant bg-surface-dim text-primary focus:ring-primary/50 focus:ring-offset-0 focus:ring-offset-transparent" type="checkbox"/>
+<span class="text-body-sm font-mono-data text-on-surface">Type II Hard Hat (High Visibility)</span>
+</label>
+<label class="flex items-center gap-3 p-2 hover:bg-surface-variant/30 rounded cursor-pointer transition-colors border border-transparent hover:border-outline-variant/30">
+<input class="w-4 h-4 rounded border-outline-variant bg-surface-dim text-primary focus:ring-primary/50 focus:ring-offset-0 focus:ring-offset-transparent" type="checkbox"/>
+<span class="text-body-sm font-mono-data text-on-surface">Level 3 Life Vest / Flotation</span>
+</label>
+<label class="flex items-center gap-3 p-2 hover:bg-surface-variant/30 rounded cursor-pointer transition-colors border border-transparent hover:border-outline-variant/30">
+<input class="w-4 h-4 rounded border-outline-variant bg-surface-dim text-primary focus:ring-primary/50 focus:ring-offset-0 focus:ring-offset-transparent" type="checkbox"/>
+<span class="text-body-sm font-mono-data text-on-surface">UHF Tactical Transceiver</span>
+</label>
+<label class="flex items-center gap-3 p-2 hover:bg-surface-variant/30 rounded cursor-pointer transition-colors border border-transparent hover:border-outline-variant/30">
+<input checked="" class="w-4 h-4 rounded border-outline-variant bg-surface-dim text-primary focus:ring-primary/50 focus:ring-offset-0 focus:ring-offset-transparent" type="checkbox"/>
+<span class="text-body-sm font-mono-data text-on-surface-variant line-through opacity-70">Personal First Aid Kit (IFAK)</span>
+</label>
+</div>
+</section>
+<!-- Post-Rescue Photo Uploader (Bottom Right) -->
+<section class="xl:col-span-7 bg-surface-container-low border border-outline-variant/30 rounded-lg p-panel-padding flex flex-col">
+<div class="flex items-center gap-2 mb-4 border-b border-outline-variant/20 pb-3">
+<span class="material-symbols-outlined text-tertiary text-[20px]">center_focus_strong</span>
+<h3 class="text-body-base font-headline-md text-on-surface tracking-wide uppercase">Verification Uplink</h3>
+<span class="ml-auto text-[10px] font-mono-label text-tertiary-fixed-dim border border-tertiary/30 px-2 py-0.5 rounded uppercase">Gemini Vision Ready</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-4">
+Upload post-clearance photographic evidence. Gemini Vision AI will automatically verify zone sterility and log structural integrity telemetry.
+</p>
+<div class="flex-1 border-2 border-dashed border-outline-variant/50 hover:border-primary/70 hover:bg-primary/5 rounded-lg flex flex-col items-center justify-center p-8 transition-all duration-200 cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">cloud_upload</span>
+</div>
+<p class="text-body-sm font-headline-md text-on-surface mb-1">Select evidence files or drag &amp; drop</p>
+<p class="text-[11px] font-mono-data text-on-surface-variant/60 uppercase tracking-wider">JPG, PNG, HEIC up to 50MB</p>
+</div>
+</section>
+</div>
+</div>
+<!-- JSON: Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/30 fixed bottom-0 left-0 w-full flex justify-between items-center px-margin-desktop h-10 z-50 md:pl-[280px]"> <!-- Added md:pl to account for sidebar + padding roughly -->
+<span class="text-mono-label font-bold text-on-surface uppercase tracking-widest text-[10px]">© 2024 SOTERIA ENGINE • MISSION CRITICAL</span>
+<div class="flex gap-6">
+<a class="text-on-surface-variant/70 text-mono-label font-mono-label uppercase text-[10px] hover:text-on-surface transition-opacity" href="#">SYSTEM STATUS: OPTIMAL</a>
+<a class="text-on-surface-variant/70 text-mono-label font-mono-label uppercase text-[10px] hover:text-on-surface transition-opacity" href="#">LEGAL PROTOCOLS</a>
+<a class="text-tertiary dark:text-tertiary-fixed-dim text-mono-label font-mono-label uppercase text-[10px] hover:text-on-surface transition-opacity font-bold" href="#">EMERGENCY: 911</a>
+</div>
+</footer>
+</main>
+</body></html>

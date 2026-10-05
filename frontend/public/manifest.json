@@ -1,0 +1,17 @@
+{
+  "name": "SOTERIA — Offline-First Disaster Triage & Volunteer Dispatch",
+  "short_name": "SOTERIA",
+  "description": "Multimodal AI Disaster Triage, 3D GIS Command, and Volunteer Proximity Dispatch PWA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090D16",
+  "theme_color": "#DC2626",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

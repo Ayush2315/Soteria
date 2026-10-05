@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SOTERIA - Gateway</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ff4f00",
+                        "secondary-container": "#e2e8f0",
+                        "surface": "#f8fafc",
+                        "on-error-container": "#410002",
+                        "surface-container": "#f1f5f9",
+                        "on-error": "#ffffff",
+                        "error": "#dc2626",
+                        "primary-container": "#ffd7cc",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e2e8f0",
+                        "secondary": "#64748b",
+                        "surface-bright": "#ffffff",
+                        "tertiary-fixed": "#334155",
+                        "on-tertiary-fixed-variant": "#475569",
+                        "on-surface-variant": "#475569",
+                        "surface-variant": "#e2e8f0",
+                        "inverse-surface": "#0f172a",
+                        "surface-container-low": "#ffffff",
+                        "on-tertiary-fixed": "#0f172a",
+                        "on-primary-fixed-variant": "#cc3f00",
+                        "outline-variant": "#cbd5e1",
+                        "on-surface": "#0f172a",
+                        "inverse-primary": "#ff4f00",
+                        "on-primary-container": "#331000",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#0f172a",
+                        "primary-fixed": "#ff8a5c",
+                        "on-background": "#0f172a",
+                        "on-primary-fixed": "#331000",
+                        "on-primary": "#ffffff",
+                        "outline": "#94a3b8",
+                        "on-secondary-fixed": "#0f172a",
+                        "on-tertiary-container": "#0f172a",
+                        "surface-container-highest": "#cbd5e1",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#ff4f00",
+                        "tertiary-container": "#e2e8f0",
+                        "primary": "#ff4f00",
+                        "surface-dim": "#cbd5e1",
+                        "inverse-on-surface": "#f1f5f9",
+                        "tertiary-fixed-dim": "#475569",
+                        "tertiary": "#334155",
+                        "secondary-fixed-dim": "#94a3b8",
+                        "background": "#f8fafc",
+                        "on-secondary-fixed-variant": "#334155",
+                        "secondary-fixed": "#cbd5e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "panel-padding": "20px",
+                        "margin-desktop": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "mono-data": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-base": ["Inter"],
+                        "mono-label": ["JetBrains Mono"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-data": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "mono-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .tactical-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(71, 85, 105, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(71, 85, 105, 0.1) 1px, transparent 1px);
+        }
+        .pulse-led {
+            animation: pulse-orange 2s infinite;
+        }
+        @keyframes pulse-orange {
+            0% { box-shadow: 0 0 0 0 rgba(255, 79, 0, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 79, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 79, 0, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-base overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container relative">
+<!-- Ambient Tactical Grid Background -->
+<div class="fixed inset-0 tactical-grid pointer-events-none z-0 opacity-50"></div>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center relative z-10 px-margin-mobile md:px-margin-desktop py-12 md:py-24">
+<!-- Hero Section -->
+<div class="max-w-4xl w-full text-center mb-16 relative">
+<div class="mb-8 flex justify-center">
+<img alt="SOTERIA Shield Logo" class="w-32 h-32 md:w-48 md:h-48 drop-shadow-[0_0_15px_rgba(255,79,0,0.2)] invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDckcOrrLGSz-qIYu7FwLPo_XFDSzm46Aj-9ZiVTrFl7RNr5R5pTp6xs1S95Jo_wyYkiQ2npOrC3Pit2dH3YBvlUc-Cx6th_VrlJ_nKjxWJSDXxg0_y4Dh1mencRPclBPXCH1nERnhT_K-WJeYXjAWdpGb771nHSCa9PcS17hSepAMzVZCHvwAasQHcxPeWM_Z0kf-UtriMVI4yA3tkbUJ_hqFsMescwub20WwFlJKWNexLSiJdd16Ktw"/>
+</div>
+<h1 class="text-display-lg font-display-lg text-primary tracking-tight mb-4 uppercase drop-shadow-[0_0_8px_rgba(255,79,0,0.3)]">
+                SOTERIA
+            </h1>
+<h2 class="text-headline-md font-headline-md text-on-surface-variant mb-6 border-b border-outline-variant/30 pb-6 inline-block">
+                Intelligent Multimodal Disaster Response &amp; Triage Engine
+            </h2>
+<div class="flex items-center justify-center gap-3 text-mono-data font-mono-data text-secondary uppercase">
+<span class="w-2 h-2 rounded-full bg-primary pulse-led"></span>
+<span>System Status: Operational</span>
+<span class="text-outline-variant">|</span>
+<span>Awaiting Credentials</span>
+</div>
+</div>
+<!-- Role Access Cards (Bento/Asymmetric Layout) -->
+<div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-gutter">
+<!-- Citizen Portal Card -->
+<div class="bg-surface-container-low border border-outline-variant rounded flex flex-col overflow-hidden group hover:border-primary/50 transition-colors duration-300 relative shadow-sm">
+<!-- Glass Overlay -->
+<div class="absolute inset-0 bg-gradient-to-b from-transparent to-surface-container/50 pointer-events-none"></div>
+<div class="p-panel-padding flex flex-col flex-grow relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-on-surface transition-colors">groups</span>
+<span class="text-mono-label font-mono-label px-2 py-1 bg-surface-variant text-secondary rounded uppercase">Tier 1</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2">Citizen Portal</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-8 flex-grow">
+                        Public access gateway. Submit SOS requests, access local broadcast alerts, and view evacuation routes without authentication.
+                    </p>
+<div class="space-y-3">
+<button class="w-full bg-error/10 text-error border border-error/30 hover:bg-error/20 font-mono-label text-mono-label uppercase py-3 px-4 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">warning</span>
+                            Guest SOS
+                        </button>
+<button class="w-full bg-transparent border border-outline-variant hover:border-primary text-on-surface font-mono-label text-mono-label uppercase py-3 px-4 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">login</span>
+                            Citizen Login
+                        </button>
+</div>
+</div>
+</div>
+<!-- Volunteer Hub Card (Slightly Elevated visually) -->
+<div class="bg-surface-container border border-outline-variant rounded flex flex-col overflow-hidden group hover:border-primary/50 transition-colors duration-300 relative md:-mt-4 md:mb-4 shadow-md">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-50"></div>
+<div class="p-panel-padding flex flex-col flex-grow relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-4xl text-primary drop-shadow-[0_0_5px_rgba(255,79,0,0.3)]">volunteer_activism</span>
+<span class="text-mono-label font-mono-label px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded uppercase">Tier 2</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2">Volunteer Hub</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-8 flex-grow">
+                        Registered responder access. Receive task assignments, update ground status, and coordinate with local teams.
+                    </p>
+<form class="space-y-4">
+<div>
+<input class="w-full bg-surface-bright border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-on-surface font-mono-data text-mono-data p-3 rounded placeholder:text-outline outline-none transition-all" placeholder="Volunteer ID / Email" type="text"/>
+</div>
+<div>
+<input class="w-full bg-surface-bright border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-on-surface font-mono-data text-mono-data p-3 rounded placeholder:text-outline outline-none transition-all" placeholder="Passphrase" type="password"/>
+</div>
+<button class="w-full bg-surface-bright border border-outline-variant hover:border-primary text-primary font-mono-label text-mono-label uppercase py-3 px-4 rounded transition-colors flex items-center justify-center gap-2 mt-4" type="button">
+                            Secure Login
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</form>
+</div>
+</div>
+<!-- HQ Command Center Card -->
+<div class="bg-surface-container-low border border-outline-variant rounded flex flex-col overflow-hidden group hover:border-error/50 transition-colors duration-300 relative shadow-sm">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')] opacity-5 pointer-events-none"></div>
+<div class="p-panel-padding flex flex-col flex-grow relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-error transition-colors">security</span>
+<span class="text-mono-label font-mono-label px-2 py-1 bg-surface-variant text-secondary rounded uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">lock</span>
+                            Restricted
+                        </span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2">HQ Command Center</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-8 flex-grow">
+                        Strategic oversight dashboard. Full access to intelligence feeds, automated triage, and global response coordination.
+                    </p>
+<div class="bg-surface-variant/50 border border-outline-variant/50 p-4 rounded mb-4">
+<p class="text-mono-data font-mono-data text-secondary text-xs uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-error">gpp_maybe</span>
+                            Requires YubiKey or Biometric 2FA
+                        </p>
+</div>
+<button class="w-full bg-primary text-on-primary hover:bg-primary/90 font-mono-label text-mono-label uppercase py-3 px-4 rounded transition-colors flex items-center justify-center gap-2 mt-auto">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">fingerprint</span>
+                        Initiate HQ Access
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Global Footer Component (Shared) -->
+<footer class="bg-surface-container-lowest fixed bottom-0 left-0 w-full flex justify-between items-center px-margin-desktop z-50 docked bottom-0 full-width h-10 border-t border-outline-variant/50 flat tonal layer no shadows">
+<div class="text-mono-label font-bold text-on-surface">
+            © 2024 SOTERIA ENGINE • MISSION CRITICAL
+        </div>
+<div class="flex gap-6">
+<a class="text-mono-label font-mono-label uppercase text-primary hover:text-primary/80 transition-opacity flex items-center gap-2" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-primary pulse-led"></span>
+                SYSTEM STATUS: OPTIMAL
+            </a>
+<a class="text-mono-label font-mono-label uppercase text-on-surface-variant hover:text-on-surface transition-opacity" href="#">LEGAL PROTOCOLS</a>
+<a class="text-mono-label font-mono-label uppercase text-error hover:text-error/80 transition-opacity" href="#">EMERGENCY: 911</a>
+</div>
+</footer>
+</body></html>

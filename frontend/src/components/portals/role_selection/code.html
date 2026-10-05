@@ -1,0 +1,292 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Kinetic Response - Who Are You?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#ffb59e",
+                      "tertiary-fixed": "#d8e3fb",
+                      "on-secondary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#0b1c30",
+                      "secondary": "#705d00",
+                      "primary-fixed": "#ffdbd0",
+                      "on-background": "#0b1c30",
+                      "outline": "#916f65",
+                      "on-tertiary-container": "#fefcff",
+                      "on-primary-fixed-variant": "#842500",
+                      "error-container": "#ffdad6",
+                      "inverse-primary": "#ffb59e",
+                      "tertiary-container": "#6a758a",
+                      "outline-variant": "#e6beb2",
+                      "surface-container": "#e5eeff",
+                      "on-tertiary-fixed-variant": "#3c475a",
+                      "background": "#f8f9ff",
+                      "on-primary-fixed": "#3a0b00",
+                      "surface-container-high": "#dce9ff",
+                      "surface-bright": "#f8f9ff",
+                      "on-surface-variant": "#5c4037",
+                      "surface-container-highest": "#d3e4fe",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-secondary-fixed": "#221b00",
+                      "on-tertiary-fixed": "#111c2d",
+                      "surface-dim": "#cbdbf5",
+                      "primary-container": "#d34000",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#fcd400",
+                      "inverse-surface": "#213145",
+                      "primary": "#a93100",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#515c71",
+                      "tertiary-fixed-dim": "#bcc7de",
+                      "surface": "#f8f9ff",
+                      "surface-tint": "#ad3300",
+                      "on-primary-container": "#fffbff",
+                      "secondary-fixed-dim": "#e9c400",
+                      "on-secondary-fixed-variant": "#544600",
+                      "surface-container-low": "#eff4ff",
+                      "on-secondary-container": "#6e5c00",
+                      "secondary-fixed": "#ffe16d",
+                      "surface-variant": "#d3e4fe",
+                      "on-error": "#ffffff",
+                      "on-tertiary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xl": "64px",
+                      "gutter": "16px",
+                      "xs": "4px",
+                      "md": "24px",
+                      "sm": "12px",
+                      "margin-mobile": "16px",
+                      "base": "8px",
+                      "lg": "40px",
+                      "margin-desktop": "32px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "code-data": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg-bold": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "code-data": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg-bold": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-inverse-surface text-on-surface dark:text-inverse-on-surface min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed-dim font-body-md text-body-md docked full-width top-0 border-b-2 border-outline-variant dark:border-outline flat no shadows fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+<div class="flex items-center gap-gutter">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim hidden md:block">Kinetic Response</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim md:hidden">Kinetic Response</span>
+</div>
+<!-- Navigation Links - Hidden on Mobile -->
+<nav class="hidden md:flex gap-md h-full">
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors px-base" href="#">Dashboard</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors px-base" href="#">Incidents</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors px-base" href="#">Resources</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="p-base rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors text-primary dark:text-primary-fixed-dim" id="theme-toggle">
+<span class="material-symbols-outlined" data-icon="light_mode">light_mode</span>
+</button>
+<button class="p-base rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors text-primary dark:text-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-24 pb-16 px-margin-mobile md:px-margin-desktop flex flex-col items-center justify-center">
+<div class="text-center mb-12 max-w-2xl">
+<h1 class="font-display-lg text-display-lg text-on-surface dark:text-inverse-on-surface mb-sm">Who Are You?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant">Select your operational clearance to access the appropriate dashboard. Kinetic Response protocols require accurate role identification.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md w-full max-w-6xl">
+<!-- Citizen Card -->
+<a class="group flex flex-col bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md hover:-translate-y-1 transition-transform duration-200 hover:shadow-[4px_4px_0px_0px_#a93100] dark:hover:shadow-[4px_4px_0px_0px_#ffb59e] relative overflow-hidden" href="#">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 dark:bg-primary-fixed-dim/5 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+<div class="mb-sm">
+<span class="font-label-sm text-label-sm text-secondary dark:text-secondary-fixed bg-secondary-container/20 dark:bg-secondary-fixed/20 px-xs py-[2px] rounded uppercase">Clearance Level 0</span>
+</div>
+<div class="flex items-center gap-sm mb-md text-primary dark:text-primary-fixed-dim">
+<span class="material-symbols-outlined fill text-4xl" data-icon="waving_hand">waving_hand</span>
+<h2 class="font-headline-lg text-headline-lg hidden md:block">Citizens</h2>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden">Citizens</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant mb-xl flex-grow">
+                    Access emergency help, submit localized incident reports, and view critical area information. For immediate public use.
+                </p>
+<div class="flex items-center justify-between text-primary dark:text-primary-fixed-dim font-body-lg-bold text-body-lg-bold">
+<span>Enter Portal</span>
+<span class="material-symbols-outlined group-hover:translate-x-2 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</a>
+<!-- Volunteer Card -->
+<a class="group flex flex-col bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md hover:-translate-y-1 transition-transform duration-200 hover:shadow-[4px_4px_0px_0px_#a93100] dark:hover:shadow-[4px_4px_0px_0px_#ffb59e] relative overflow-hidden" href="#">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 dark:bg-secondary-fixed/5 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+<div class="mb-sm">
+<span class="font-label-sm text-label-sm text-primary dark:text-primary-fixed-dim bg-primary-container/20 dark:bg-primary/20 px-xs py-[2px] rounded uppercase">Clearance Level 1</span>
+</div>
+<div class="flex items-center gap-sm mb-md text-on-surface dark:text-inverse-on-surface">
+<span class="material-symbols-outlined fill text-4xl text-secondary dark:text-secondary-fixed" data-icon="volunteer_activism">volunteer_activism</span>
+<h2 class="font-headline-lg text-headline-lg hidden md:block">Volunteers</h2>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden">Volunteers</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant mb-xl flex-grow">
+                    Receive task assignments, coordinate logistics on the ground, and update operation status in real-time.
+                </p>
+<div class="flex items-center justify-between text-on-surface dark:text-inverse-on-surface font-body-lg-bold text-body-lg-bold group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors">
+<span>Access Orders</span>
+<span class="material-symbols-outlined group-hover:translate-x-2 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</a>
+<!-- HQ Card -->
+<a class="group flex flex-col bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md hover:-translate-y-1 transition-transform duration-200 hover:shadow-[4px_4px_0px_0px_#a93100] dark:hover:shadow-[4px_4px_0px_0px_#ffb59e] relative overflow-hidden" href="#">
+<div class="absolute top-0 right-0 w-32 h-32 bg-error/5 dark:bg-error-container/5 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+<div class="mb-sm">
+<span class="font-label-sm text-label-sm text-error dark:text-error-container bg-error/10 dark:bg-error-container/10 px-xs py-[2px] rounded uppercase">Clearance Level 3+</span>
+</div>
+<div class="flex items-center gap-sm mb-md text-on-surface dark:text-inverse-on-surface">
+<span class="material-symbols-outlined fill text-4xl text-error dark:text-error-container" data-icon="admin_panel_settings">admin_panel_settings</span>
+<h2 class="font-headline-lg text-headline-lg hidden md:block">HQ</h2>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden">HQ</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant mb-xl flex-grow">
+                    Strategic command interface. Oversee global resource management, high-level incident resolution, and personnel deployment.
+                </p>
+<div class="flex items-center justify-between text-on-surface dark:text-inverse-on-surface font-body-lg-bold text-body-lg-bold group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors">
+<span>Command Secure Login</span>
+<span class="material-symbols-outlined group-hover:translate-x-2 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</a>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-inverse-surface text-secondary dark:text-secondary-fixed font-label-sm text-label-sm w-full bottom-0 border-t-2 border-outline-variant dark:border-outline flat no shadows w-full py-lg px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-md mt-auto">
+<div>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim mb-xs block">Kinetic Response</span>
+<p class="text-on-surface-variant dark:text-surface-variant opacity-80">© 2024 Kinetic Response. Internal Use Only.</p>
+</div>
+<div class="flex flex-wrap gap-md md:justify-end items-end">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed opacity-80 hover:opacity-100 transition-opacity" href="#">Emergency Hotline: 911</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed opacity-80 hover:opacity-100 transition-opacity" href="#">Contact HQ</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Protocol</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed opacity-80 hover:opacity-100 transition-opacity" href="#">System Status</a>
+</div>
+</footer>
+<script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleIcon = themeToggleBtn.querySelector('span');
+        const htmlElement = document.documentElement;
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                themeToggleIcon.textContent = 'dark_mode';
+            } else {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                themeToggleIcon.textContent = 'light_mode';
+            }
+        });
+    </script>
+</body></html>
